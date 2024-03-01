@@ -59,38 +59,20 @@ namespace SharpOutcome
 
         public void Switch(Action<TGoodOutcome> onGoodOutcome, Action<TBadOutcome> onBadOutcome)
         {
-            if (_isBadOutcome)
-            {
-                onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
-            }
-            else
-            {
-                onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
-            }
+            if (_isBadOutcome) onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
+            else onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
         }
 
         public async Task SwitchAsync(Func<TGoodOutcome, Task> onGoodOutcome, Action<TBadOutcome> onBadOutcome)
         {
-            if (_isBadOutcome)
-            {
-                onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
-            }
-            else
-            {
-                await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
-            }
+            if (_isBadOutcome) onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
+            else await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
         }
 
         public async Task SwitchAsync(Func<TGoodOutcome, Task> onGoodOutcome, Func<TBadOutcome, Task> onBadOutcome)
         {
-            if (_isBadOutcome)
-            {
-                await onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
-            }
-            else
-            {
-                await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
-            }
+            if (_isBadOutcome) await onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
+            else await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
         }
     }
 }
