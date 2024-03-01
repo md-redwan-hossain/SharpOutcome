@@ -57,6 +57,16 @@ namespace SharpOutcome
                 : await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
         }
 
+
+        public async Task<TOutput> MatchAsync<TOutput>(Func<TGoodOutcome, TOutput> onGoodOutcome,
+            Func<TBadOutcome, Task<TOutput>> onBadOutcome)
+        {
+            return _isBadOutcome
+                ? await onBadOutcome(_badOutcome ?? throw new InvalidOperationException())
+                : onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
+        }
+
+
         public void Switch(Action<TGoodOutcome> onGoodOutcome, Action<TBadOutcome> onBadOutcome)
         {
             if (_isBadOutcome) onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
@@ -73,6 +83,12 @@ namespace SharpOutcome
         {
             if (_isBadOutcome) await onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
             else await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
+        }
+
+        public async Task SwitchAsync(Action<TGoodOutcome> onGoodOutcome, Func<TBadOutcome, Task> onBadOutcome)
+        {
+            if (_isBadOutcome) await onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
+            else onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
         }
     }
 }
