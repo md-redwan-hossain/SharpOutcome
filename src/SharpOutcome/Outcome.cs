@@ -33,62 +33,63 @@ namespace SharpOutcome
             return new Outcome<TGoodOutcome, TBadOutcome>(badOutcome);
         }
 
-        public TOutput Match<TOutput>(Func<TGoodOutcome, TOutput> onSuccess, Func<TBadOutcome, TOutput> onFailure)
+        public TOutput Match<TOutput>(Func<TGoodOutcome, TOutput> onGoodOutcome,
+            Func<TBadOutcome, TOutput> onBadOutcome)
         {
             return _isBadOutcome
-                ? onFailure(_badOutcome ?? throw new InvalidOperationException())
-                : onSuccess(_goodOutcome ?? throw new InvalidOperationException());
+                ? onBadOutcome(_badOutcome ?? throw new InvalidOperationException())
+                : onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
         }
 
-        public async Task<TOutput> MatchAsync<TOutput>(Func<TGoodOutcome, Task<TOutput>> onSuccess,
-            Func<TBadOutcome, TOutput> onFailure)
+        public async Task<TOutput> MatchAsync<TOutput>(Func<TGoodOutcome, Task<TOutput>> onGoodOutcome,
+            Func<TBadOutcome, TOutput> onBadOutcome)
         {
             return _isBadOutcome
-                ? onFailure(_badOutcome ?? throw new InvalidOperationException())
-                : await onSuccess(_goodOutcome ?? throw new InvalidOperationException());
+                ? onBadOutcome(_badOutcome ?? throw new InvalidOperationException())
+                : await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
         }
 
-        public async Task<TOutput> MatchAsync<TOutput>(Func<TGoodOutcome, Task<TOutput>> onSuccess,
-            Func<TBadOutcome, Task<TOutput>> onFailure)
+        public async Task<TOutput> MatchAsync<TOutput>(Func<TGoodOutcome, Task<TOutput>> onGoodOutcome,
+            Func<TBadOutcome, Task<TOutput>> onBadOutcome)
         {
             return _isBadOutcome
-                ? await onFailure(_badOutcome ?? throw new InvalidOperationException())
-                : await onSuccess(_goodOutcome ?? throw new InvalidOperationException());
+                ? await onBadOutcome(_badOutcome ?? throw new InvalidOperationException())
+                : await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
         }
 
-        public void Switch(Action<TGoodOutcome> onSuccess, Action<TBadOutcome> onFailure)
+        public void Switch(Action<TGoodOutcome> onGoodOutcome, Action<TBadOutcome> onBadOutcome)
         {
             if (_isBadOutcome)
             {
-                onFailure(_badOutcome ?? throw new InvalidOperationException());
+                onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
             }
             else
             {
-                onSuccess(_goodOutcome ?? throw new InvalidOperationException());
+                onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
             }
         }
 
-        public async Task SwitchAsync(Func<TGoodOutcome, Task> onSuccess, Action<TBadOutcome> onFailure)
+        public async Task SwitchAsync(Func<TGoodOutcome, Task> onGoodOutcome, Action<TBadOutcome> onBadOutcome)
         {
             if (_isBadOutcome)
             {
-                onFailure(_badOutcome ?? throw new InvalidOperationException());
+                onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
             }
             else
             {
-                await onSuccess(_goodOutcome ?? throw new InvalidOperationException());
+                await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
             }
         }
 
-        public async Task SwitchAsync(Func<TGoodOutcome, Task> onSuccess, Func<TBadOutcome, Task> onFailure)
+        public async Task SwitchAsync(Func<TGoodOutcome, Task> onGoodOutcome, Func<TBadOutcome, Task> onBadOutcome)
         {
             if (_isBadOutcome)
             {
-                await onFailure(_badOutcome ?? throw new InvalidOperationException());
+                await onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
             }
             else
             {
-                await onSuccess(_goodOutcome ?? throw new InvalidOperationException());
+                await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
             }
         }
     }
