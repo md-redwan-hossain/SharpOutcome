@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 namespace SharpOutcome
@@ -22,6 +23,32 @@ namespace SharpOutcome
             _badOutcome = badOutcome;
             _goodOutcome = default;
         }
+
+
+        public bool TryPickGoodOutcome([NotNullWhen(true)] out TGoodOutcome? goodOutcome)
+        {
+            if (_isBadOutcome is false && _goodOutcome is not null)
+            {
+                goodOutcome = _goodOutcome;
+                return true;
+            }
+
+            goodOutcome = default;
+            return false;
+        }
+
+        public bool TryPickBadOutcome([NotNullWhen(true)] out TBadOutcome? badOutcome)
+        {
+            if (_isBadOutcome && _badOutcome is not null)
+            {
+                badOutcome = _badOutcome;
+                return true;
+            }
+
+            badOutcome = default;
+            return false;
+        }
+
 
         public static implicit operator Outcome<TGoodOutcome, TBadOutcome>(TGoodOutcome goodOutcome)
         {
@@ -65,7 +92,6 @@ namespace SharpOutcome
                 ? await onBadOutcome(_badOutcome ?? throw new InvalidOperationException())
                 : onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
         }
-
 
         public void Switch(Action<TGoodOutcome> onGoodOutcome, Action<TBadOutcome> onBadOutcome)
         {
