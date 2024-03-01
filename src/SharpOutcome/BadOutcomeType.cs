@@ -2,13 +2,27 @@ namespace SharpOutcome
 {
     public enum BadOutcomeType : byte
     {
-        Failure = 1,
-        Unexpected,
-        Validation,
-        Conflict,
-        NotFound,
-        Unauthorized,
+        Conflict = 1,
+        Denied,
+        Excessive,
+        Expired,
+        Failure,
+        False,
         Forbidden,
-        False
+        Incomplete,
+        Interrupted,
+        Negative,
+        NotFound,
+        NotReadyYet,
+        Rejected,
+        Stalled,
+        Timeout,
+        Unauthorized,
+        Unavailable,
+        Unexpected,
+        Unprocessable,
+        Validation,
+        Violation,
+        Warning
     }
 }

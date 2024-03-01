@@ -3,66 +3,72 @@ using System.Threading.Tasks;
 
 namespace SharpOutcome
 {
-    public readonly struct Outcome<TValue, TError>
+    public readonly struct Outcome<TGoodOutcome, TBadOutcome>
     {
-        private readonly TValue? _value;
-        private readonly TError? _error;
-        private bool IsError { get; }
+        private readonly TGoodOutcome? _goodOutcome;
+        private readonly TBadOutcome? _badOutcome;
+        private readonly bool _isBadOutcome;
 
-        private Outcome(TValue value)
+        private Outcome(TGoodOutcome goodOutcome)
         {
-            IsError = false;
-            _value = value;
-            _error = default;
+            _isBadOutcome = false;
+            _goodOutcome = goodOutcome;
+            _badOutcome = default;
         }
 
-        private Outcome(TError error)
+        private Outcome(TBadOutcome badOutcome)
         {
-            IsError = true;
-            _error = error;
-            _value = default;
+            _isBadOutcome = true;
+            _badOutcome = badOutcome;
+            _goodOutcome = default;
         }
 
-        public static implicit operator Outcome<TValue, TError>(TValue value) => new(value);
-
-        public static implicit operator Outcome<TValue, TError>(TError error) => new(error);
-
-        public TResult Match<TResult>(Func<TValue, TResult> success, Func<TError, TResult> failure)
+        public static implicit operator Outcome<TGoodOutcome, TBadOutcome>(TGoodOutcome goodOutcome)
         {
-            return IsError
-                ? failure(_error ?? throw new ArgumentNullException(nameof(failure)))
-                : success(_value ?? throw new ArgumentNullException(nameof(success)));
+            return new Outcome<TGoodOutcome, TBadOutcome>(goodOutcome);
         }
 
-        public async Task<TResult> MatchAsync<TResult>(Func<TValue, Task<TResult>> success,
-            Func<TError, TResult> failure)
+        public static implicit operator Outcome<TGoodOutcome, TBadOutcome>(TBadOutcome badOutcome)
         {
-            return IsError
-                ? failure(_error ?? throw new ArgumentNullException(nameof(failure)))
-                : await success(_value ?? throw new ArgumentNullException(nameof(success)));
+            return new Outcome<TGoodOutcome, TBadOutcome>(badOutcome);
         }
 
-        public void Switch(Action<TValue> success, Action<TError> failure)
+        public TOutput Match<TOutput>(Func<TGoodOutcome, TOutput> onSuccess, Func<TBadOutcome, TOutput> onFailure)
         {
-            if (IsError)
+            return _isBadOutcome
+                ? onFailure(_badOutcome ?? throw new InvalidOperationException())
+                : onSuccess(_goodOutcome ?? throw new InvalidOperationException());
+        }
+
+        public async Task<TOutput> MatchAsync<TOutput>(Func<TGoodOutcome, Task<TOutput>> onSuccess,
+            Func<TBadOutcome, TOutput> onFailure)
+        {
+            return _isBadOutcome
+                ? onFailure(_badOutcome ?? throw new InvalidOperationException())
+                : await onSuccess(_goodOutcome ?? throw new InvalidOperationException());
+        }
+
+        public void Switch(Action<TGoodOutcome> onSuccess, Action<TBadOutcome> onFailure)
+        {
+            if (_isBadOutcome)
             {
-                failure(_error ?? throw new ArgumentNullException(nameof(failure)));
+                onFailure(_badOutcome ?? throw new InvalidOperationException());
             }
             else
             {
-                success(_value ?? throw new ArgumentNullException(nameof(success)));
+                onSuccess(_goodOutcome ?? throw new InvalidOperationException());
             }
         }
 
-        public async Task SwitchAsync(Func<TValue, Task> success, Action<TError> failure)
+        public async Task SwitchAsync(Func<TGoodOutcome, Task> onSuccess, Action<TBadOutcome> onFailure)
         {
-            if (IsError)
+            if (_isBadOutcome)
             {
-                failure(_error ?? throw new ArgumentNullException(nameof(failure)));
+                onFailure(_badOutcome ?? throw new InvalidOperationException());
             }
             else
             {
-                await success(_value ?? throw new ArgumentNullException(nameof(success)));
+                await onSuccess(_goodOutcome ?? throw new InvalidOperationException());
             }
         }
     }

@@ -1,14 +1,4 @@
 namespace SharpOutcome
 {
-    public class GoodOutcome : IGoodOutcome
-    {
-        public GoodOutcome(GoodOutcomeType goodOutcomeType, string? description = null)
-        {
-            GoodOutcomeType = goodOutcomeType;
-            Reason = description;
-        }
-
-        public GoodOutcomeType GoodOutcomeType { get; }
-        public string? Reason { get; }
-    }
+    public record GoodOutcome(GoodOutcomeType GoodOutcomeType, string? Reason = null) : IGoodOutcome;
 }

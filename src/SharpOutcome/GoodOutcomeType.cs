@@ -2,9 +2,16 @@ namespace SharpOutcome
 {
     public enum GoodOutcomeType : byte
     {
-        Ok = 1,
-        Deleted,
+        Completed = 1,
+        Confirmed,
         Created,
-        True
+        Deleted,
+        Ok,
+        Positive,
+        Resolved,
+        Success,
+        True,
+        Valid,
+        Verified
     }
 }
