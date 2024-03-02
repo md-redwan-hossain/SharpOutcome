@@ -36,7 +36,7 @@ builder.Services
 
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(o => o.SupportNonNullableReferenceTypes());
 
 var app = builder.Build();
 
