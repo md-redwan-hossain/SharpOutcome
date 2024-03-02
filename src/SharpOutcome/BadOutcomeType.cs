@@ -14,6 +14,7 @@ namespace SharpOutcome
         Negative,
         NotFound,
         NotReadyYet,
+        Null,
         Rejected,
         Stalled,
         Timeout,

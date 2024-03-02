@@ -6,6 +6,7 @@ namespace SharpOutcome
         Confirmed,
         Created,
         Deleted,
+        NotNull,
         Ok,
         Positive,
         Resolved,

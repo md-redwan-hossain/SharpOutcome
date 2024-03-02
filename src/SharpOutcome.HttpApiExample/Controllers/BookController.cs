@@ -32,7 +32,7 @@ public sealed class BookController : ApiControllerBase
         );
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{id:int}")]
     public async Task<IActionResult> PutBook(int id, BookRequest dto)
     {
         if (!ModelState.IsValid) return ResponseMaker(HttpStatusCode.BadRequest);
@@ -58,7 +58,7 @@ public sealed class BookController : ApiControllerBase
         );
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteBook(int id)
     {
         var result = await _bookService.RemoveAsync(id);

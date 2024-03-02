@@ -3,6 +3,37 @@
     <PropertyGroup>
         <TargetFrameworks>net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
         <Nullable>enable</Nullable>
+        <Version>0.0.1</Version>
+        <Title>SharpOutcome</Title>
+        <Authors>Md. Redwan Hossain</Authors>
+        <Copyright>Copyright (c) Md. Redwan Hossain</Copyright>
+        <PackageProjectUrl>https://github.com/md-redwan-hossain/SharpOutcome</PackageProjectUrl>
+        <PackageIcon>logo.png</PackageIcon>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/md-redwan-hossain/SharpOutcome</RepositoryUrl>
+        <PackageTags>result result-pattern resilient-approach resilient no-exception</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <NoWarn>CS1591</NoWarn>
+        <DocumentationFile Condition="'$(Configuration)'=='Release'">bin\$(Configuration)\$(TargetFramework)\StringMate.xml</DocumentationFile>
+        <Description>SharpOutcome offers an implementation of the Result pattern featuring a straightforward API, enabling seamless code flow management without the need for exception based code flow.</Description>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\logo.png">
+            <Pack>True</Pack>
+            <PackagePath>.</PackagePath>
+            <Link>logo.png</Link>
+        </None>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <None Include="..\..\README.md">
+            <Pack>True</Pack>
+            <Link>README.md</Link>
+            <PackagePath>.</PackagePath>
+        </None>
+    </ItemGroup>
+    
 
 </Project>

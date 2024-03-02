@@ -16,7 +16,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\SharpOutcome\SharpOutcome.csproj" />
+      <ProjectReference Include="..\SharpOutcome\SharpOutcome.csproj" />
     </ItemGroup>
+
 
 </Project>
