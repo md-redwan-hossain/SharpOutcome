@@ -1,5 +1,8 @@
 namespace SharpOutcome
 {
+    /// <summary>
+    /// Represents the types of bad outcomes.
+    /// </summary>
     public enum BadOutcomeType : byte
     {
         Conflict = 1,
@@ -11,9 +14,11 @@ namespace SharpOutcome
         Forbidden,
         Incomplete,
         Interrupted,
+        InValid,
         Negative,
         NotFound,
         NotReadyYet,
+        NotVerified,
         Null,
         Rejected,
         Stalled,
