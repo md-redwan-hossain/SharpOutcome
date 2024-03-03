@@ -37,7 +37,7 @@ public sealed class BookController : ApiControllerBase
     {
         if (!ModelState.IsValid) return ResponseMaker(HttpStatusCode.BadRequest);
 
-        var result = await _bookService.UpdateAsync(id, dto);
+        Outcome<Book, IBadOutcome> result = await _bookService.UpdateAsync(id, dto);
 
         return await result.MatchAsync<IActionResult>(
             entity => ResponseMakerAsync<Book, BookResponse>(HttpStatusCode.OK, entity),

@@ -3,7 +3,7 @@ namespace SharpOutcome
     /// <summary>
     /// Represents the types of bad outcomes.
     /// </summary>
-    public enum BadOutcomeType : byte
+    public enum BadOutcomeTag : byte
     {
         Conflict = 1,
         Denied,

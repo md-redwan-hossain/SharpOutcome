@@ -11,17 +11,17 @@ public abstract class ApiControllerBase : ControllerBase
 {
     protected async Task<IActionResult> ResponseMakerAsync<TEntity, TResponse>(HttpStatusCode code, TEntity data)
     {
-        return ResponseMaker(code, await data.BuildAdapter().AdaptToTypeAsync<TResponse>(), null);
+        return ResponseMaker(code, await data.BuildAdapter().AdaptToTypeAsync<TResponse>());
     }
 
 
     protected IActionResult ResponseMaker(IGoodOutcome success)
     {
-        var code = success.GoodOutcomeType switch
+        var code = success.Tag switch
         {
-            GoodOutcomeType.Ok => HttpStatusCode.OK,
-            GoodOutcomeType.Created => HttpStatusCode.Created,
-            GoodOutcomeType.Deleted => HttpStatusCode.NoContent,
+            GoodOutcomeTag.Ok => HttpStatusCode.OK,
+            GoodOutcomeTag.Created => HttpStatusCode.Created,
+            GoodOutcomeTag.Deleted => HttpStatusCode.NoContent,
             _ => HttpStatusCode.OK,
         };
 
@@ -31,15 +31,15 @@ public abstract class ApiControllerBase : ControllerBase
 
     protected IActionResult ResponseMaker(IBadOutcome error)
     {
-        var code = error.BadOutcomeType switch
+        var code = error.Tag switch
         {
-            BadOutcomeType.Failure => HttpStatusCode.InternalServerError,
-            BadOutcomeType.Unexpected => HttpStatusCode.InternalServerError,
-            BadOutcomeType.Validation => HttpStatusCode.BadRequest,
-            BadOutcomeType.Conflict => HttpStatusCode.Conflict,
-            BadOutcomeType.NotFound => HttpStatusCode.NotFound,
-            BadOutcomeType.Unauthorized => HttpStatusCode.Unauthorized,
-            BadOutcomeType.Forbidden => HttpStatusCode.Forbidden,
+            BadOutcomeTag.Failure => HttpStatusCode.InternalServerError,
+            BadOutcomeTag.Unexpected => HttpStatusCode.InternalServerError,
+            BadOutcomeTag.Validation => HttpStatusCode.BadRequest,
+            BadOutcomeTag.Conflict => HttpStatusCode.Conflict,
+            BadOutcomeTag.NotFound => HttpStatusCode.NotFound,
+            BadOutcomeTag.Unauthorized => HttpStatusCode.Unauthorized,
+            BadOutcomeTag.Forbidden => HttpStatusCode.Forbidden,
             _ => HttpStatusCode.InternalServerError,
         };
 

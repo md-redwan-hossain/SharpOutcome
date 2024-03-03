@@ -23,7 +23,7 @@ public class BookService : IBookService
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return new BadOutcome(BadOutcomeType.Unexpected);
+            return new BadOutcome(BadOutcomeTag.Unexpected);
         }
     }
 
@@ -32,7 +32,7 @@ public class BookService : IBookService
         try
         {
             var entityToUpdate = await _bookDbContext.Books.FindAsync(id);
-            if (entityToUpdate is null) return new BadOutcome(BadOutcomeType.NotFound);
+            if (entityToUpdate is null) return new BadOutcome(BadOutcomeTag.NotFound);
 
             await dto.BuildAdapter().AdaptToAsync(entityToUpdate);
             _bookDbContext.Books.Attach(entityToUpdate);
@@ -43,7 +43,7 @@ public class BookService : IBookService
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return new BadOutcome(BadOutcomeType.Unexpected);
+            return new BadOutcome(BadOutcomeTag.Unexpected);
         }
     }
 
@@ -55,7 +55,7 @@ public class BookService : IBookService
     public async Task<Outcome<Book, IBadOutcome>> GetOneAsync(int id)
     {
         var entity = await _bookDbContext.Books.FindAsync(id);
-        if (entity is null) return new BadOutcome(BadOutcomeType.NotFound);
+        if (entity is null) return new BadOutcome(BadOutcomeTag.NotFound);
         return entity;
     }
 
@@ -64,7 +64,7 @@ public class BookService : IBookService
         try
         {
             var entityToDelete = await _bookDbContext.Books.FindAsync(id);
-            if (entityToDelete is null) return new BadOutcome(BadOutcomeType.NotFound);
+            if (entityToDelete is null) return new BadOutcome(BadOutcomeTag.NotFound);
 
             if (_bookDbContext.Entry(entityToDelete).State is EntityState.Detached)
             {
@@ -74,12 +74,12 @@ public class BookService : IBookService
             _bookDbContext.Books.Remove(entityToDelete);
             await _bookDbContext.SaveChangesAsync();
 
-            return new GoodOutcome(GoodOutcomeType.Deleted);
+            return new GoodOutcome(GoodOutcomeTag.Deleted);
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return new BadOutcome(BadOutcomeType.Unexpected);
+            return new BadOutcome(BadOutcomeTag.Unexpected);
         }
     }
 }

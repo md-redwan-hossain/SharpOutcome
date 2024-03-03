@@ -4,7 +4,7 @@ namespace SharpOutcome
     /// <summary>
     /// Represents the types of good outcomes.
     /// </summary>
-    public enum GoodOutcomeType : byte
+    public enum GoodOutcomeTag : byte
     {
         Completed = 1,
         Confirmed,
