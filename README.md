@@ -27,9 +27,8 @@ for `TBadOutcome` that is meant for something good or success, but you shouldn't
 
 - As method parameter value.
 - Method return value.
-- A complete REST API with CRUD functionality example is also given to showcase the usefullness of
-  SharpOutcome. Souce code is
-  available [here.](https://github.com/md-redwan-hossain/SharpOutcome/tree/main/src/SharpOutcome.HttpApiExample)
+- A complete REST API with CRUD functionality example is also given to showcase the usefulness of SharpOutcome. Source
+  code is available [here.](https://github.com/md-redwan-hossain/SharpOutcome/tree/main/src/SharpOutcome.HttpApiExample)
 
 Here's is an example with a service class method:
 
@@ -71,7 +70,7 @@ public async Task<IActionResult> PutBook(int id, BookRequest dto)
     );
 }
 
-protected IActionResult ResponseMaker(IBadOutcome error)
+private IActionResult ResponseMaker(IBadOutcome error)
 {
     var code = error.Tag switch
     {
@@ -88,7 +87,7 @@ protected IActionResult ResponseMaker(IBadOutcome error)
     return ResponseMaker(code, null, error.Reason);
 }
 
-protected IActionResult ResponseMaker(HttpStatusCode code, object? data = null, string? message = null)
+private IActionResult ResponseMaker(HttpStatusCode code, object? data = null, string? message = null)
 {
     if (code == HttpStatusCode.NoContent) return NoContent();
 
@@ -106,38 +105,76 @@ protected IActionResult ResponseMaker(HttpStatusCode code, object? data = null, 
 }
 ```
 
-### `Match` and `MatchAsync`
+---
+
+### Available API:
+
+---
+
+#### `Match` and `MatchAsync`
 
 The `Match` and `MatchAsync` methods execute a function on the good or bad outcome and return the result. If the outcome
 is bad, the function for the bad outcome is executed; otherwise, the function for the good outcome is executed.
 
+```csharp
+return await result.MatchAsync<IActionResult>(
+    entity => ResponseMakerAsync<Book, BookResponse>(HttpStatusCode.OK, entity),
+    err => ResponseMaker(err)
+);
+```
+
 ---
 
-### `Switch` and `SwitchAsync`
+#### `Switch` and `SwitchAsync`
 
 The `Switch` and `SwitchAsync` methods execute an action on the good or bad outcome. If the outcome is bad, the action
 for the bad outcome is executed; otherwise, the action for the good outcome is executed. These methods do not return
 anything.
 
+```csharp
+await result.SwitchAsync(
+    entity => SendOkAsync(HttpStatusCode.OK, entity),
+    err => SendBadRequestAsync(err)
+);
+```
+
 ---
 
-### `TryPickGoodOutcome` and `TryPickBadOutcome`
+#### `TryPickGoodOutcome` and `TryPickBadOutcome`
 
 The `TryPickGoodOutcome` and `TryPickBadOutcome` methods try to extract the good or bad outcome from the `Outcome`
 respectively. These methods are overloaded.
 
-#### TryPickGoodOutcome(out TGoodOutcome? goodOutcome)
+##### `TryPickGoodOutcome(out TGoodOutcome? goodOutcome)`
 
 This method tries to extract the good outcome from the `Outcome` instance. If the instance represents a good outcome, it
 assigns the good outcome to the `goodOutcome` out parameter and returns true. If the instance represents a bad outcome,
 it assigns the default value to the `goodOutcome` out parameter and returns false.
 
-#### TryPickGoodOutcome(out TGoodOutcome? goodOutcome, out TBadOutcome? badOutcome)
+```csharp
+var checkConfirmation = await CheckConfirmation(dto.Id);
+
+if (checkConfirmation.TryPickGoodOutcome(out var goodOutcome))
+{
+    return new GoodOutcome(GoodOutcomeTag.Valid, goodOutcome.ToString());
+}
+```
+
+##### `TryPickGoodOutcome(out TGoodOutcome? goodOutcome, out TBadOutcome? badOutcome)`
 
 This overload of `TryPickGoodOutcome` tries to extract both the good and bad outcomes from the `Outcome` instance. If
 the instance represents a good outcome, it assigns the good outcome to the `goodOutcome` out parameter, the default
 value to the `badOutcome` out parameter, and returns true. If the instance represents a bad outcome, it assigns the
 default value to the `goodOutcome` out parameter, the bad outcome to the `badOutcome` out parameter, and returns false.
 
-The `TryPickBadOutcome` methods work in a similar way, but they try to extract the bad outcome instead of the good
+```csharp
+var result =  Demo.IdSender();
+
+return result.TryPickGoodOutcome(out var good, out var bad)
+    ? Results.Ok(good)
+    : Results.BadRequest(bad);
+```
+
+The `TryPickBadOutcome` method and its overload work in a similar way of `TryPickGoodOutcome`, but they try to extract
+the bad outcome instead of the good
 outcome.
