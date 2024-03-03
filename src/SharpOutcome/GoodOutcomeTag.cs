@@ -6,12 +6,16 @@ namespace SharpOutcome
     /// </summary>
     public enum GoodOutcomeTag : byte
     {
-        Completed = 1,
+        Accepted = 1,
+        Authorized,
+        Authenticated,
+        Completed,
         Confirmed,
         Created,
         Deleted,
         NotNull,
         Ok,
+        Matched,
         Positive,
         Resolved,
         Success,
