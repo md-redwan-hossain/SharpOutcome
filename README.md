@@ -1,6 +1,6 @@
 ### Rationale
 
-`SharpOutcome` offers an implementation of the Result pattern featuring a straightforward API, enabling seamless code flow management without the need for exception based code flow.
+`SharpOutcome` offers an implementation of the Result pattern featuring a straightforward API, enabling seamless code flow management without the need for exceptions.
 
 ### Installation
 
