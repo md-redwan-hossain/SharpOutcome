@@ -13,6 +13,8 @@ namespace SharpOutcome
         Confirmed,
         Created,
         Deleted,
+        Found,
+        NoConflict,
         NotNull,
         Ok,
         Matched,
@@ -20,6 +22,7 @@ namespace SharpOutcome
         Resolved,
         Success,
         True,
+        Unique,
         Valid,
         Verified
     }

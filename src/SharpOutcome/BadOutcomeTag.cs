@@ -7,6 +7,7 @@ namespace SharpOutcome
     {
         Conflict = 1,
         Denied,
+        Duplicate,
         Excessive,
         Expired,
         Failure,
