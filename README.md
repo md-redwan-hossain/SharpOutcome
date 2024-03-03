@@ -176,5 +176,4 @@ return result.TryPickGoodOutcome(out var good, out var bad)
 ```
 
 The `TryPickBadOutcome` method and its overload work in a similar way of `TryPickGoodOutcome`, but they try to extract
-the bad outcome instead of the good
-outcome.
+the bad outcome instead of the good outcome.
