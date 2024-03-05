@@ -9,6 +9,7 @@ public class BookConfig : IEntityTypeConfiguration<Book>
     {
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Title).HasMaxLength(256);
+        builder.Property(x => x.Isbn).HasMaxLength(38);
         builder.Property(x => x.Genre).HasMaxLength(256);
         builder.Property(x => x.Author).HasMaxLength(256);
     }

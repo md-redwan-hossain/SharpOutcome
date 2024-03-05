@@ -35,7 +35,7 @@ public abstract class ApiControllerBase : ControllerBase
         {
             BadOutcomeTag.Failure => HttpStatusCode.InternalServerError,
             BadOutcomeTag.Unexpected => HttpStatusCode.InternalServerError,
-            BadOutcomeTag.Validation => HttpStatusCode.BadRequest,
+            BadOutcomeTag.BadRequest => HttpStatusCode.BadRequest,
             BadOutcomeTag.Conflict => HttpStatusCode.Conflict,
             BadOutcomeTag.NotFound => HttpStatusCode.NotFound,
             BadOutcomeTag.Unauthorized => HttpStatusCode.Unauthorized,

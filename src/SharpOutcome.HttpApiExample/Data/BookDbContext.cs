@@ -21,6 +21,7 @@ public class BookDbContext(DbContextOptions<BookDbContext> options)
 
         return new Bogus.Faker<Book>()
             .RuleFor(b => b.Id, f => f.IndexFaker + 1)
+            .RuleFor(b => b.Isbn, _ => Guid.NewGuid().ToString())
             .RuleFor(b => b.Title, f => f.Lorem.Sentence(3))
             .RuleFor(b => b.Genre, f => f.PickRandom(genres))
             .RuleFor(b => b.Author, f => f.Name.FullName())

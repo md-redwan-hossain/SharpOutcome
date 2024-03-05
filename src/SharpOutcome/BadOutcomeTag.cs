@@ -5,6 +5,7 @@ namespace SharpOutcome
     /// </summary>
     public enum BadOutcomeTag : byte
     {
+        BadRequest,
         Conflict = 1,
         Denied,
         Duplicate,
@@ -15,7 +16,7 @@ namespace SharpOutcome
         Forbidden,
         Incomplete,
         Interrupted,
-        InValid,
+        Invalid,
         Negative,
         NotAuthenticated,
         NotFound,
@@ -29,8 +30,9 @@ namespace SharpOutcome
         Unauthorized,
         Unavailable,
         Unexpected,
+        Unknown,
         Unprocessable,
-        Validation,
+        ValidationFailure,
         Violation,
         Warning
     }

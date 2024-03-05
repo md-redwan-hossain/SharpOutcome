@@ -14,6 +14,15 @@ public class BookService : IBookService
     {
         try
         {
+            var duplicateIsbn = await _bookDbContext.Books
+                .Where(x => x.Isbn == dto.Isbn)
+                .FirstOrDefaultAsync();
+            
+            if (duplicateIsbn is not null)
+            {
+                return new BadOutcome(BadOutcomeTag.Conflict, $"Duplicate isbn: {dto.Isbn}");
+            }
+
             var entity = new Book();
             await dto.BuildAdapter().AdaptToAsync(entity);
             await _bookDbContext.Books.AddAsync(entity);
