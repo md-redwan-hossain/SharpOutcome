@@ -64,8 +64,8 @@ public async Task<IActionResult> PutBook(int id, BookRequest dto)
 
     Outcome<Book, IBadOutcome> result = await _bookService.UpdateAsync(id, dto);
 
-    return await result.MatchAsync<IActionResult>(
-        entity => ResponseMakerAsync(HttpStatusCode.OK, entity),
+    return result.Match<IActionResult>(
+        entity => ResponseMaker(HttpStatusCode.OK, entity),
         err => ResponseMaker(err)
     );
 }
