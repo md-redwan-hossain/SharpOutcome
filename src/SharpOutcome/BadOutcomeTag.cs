@@ -5,8 +5,8 @@ namespace SharpOutcome
     /// </summary>
     public enum BadOutcomeTag : byte
     {
-        BadRequest,
-        Conflict = 1,
+        BadRequest = 1,
+        Conflict,
         Denied,
         Duplicate,
         Excessive,

@@ -1,10 +1,10 @@
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.Formatters;
+using System.Text.Json.Serialization;
+using FluentValidation;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using SharpOutcome.HttpApiExample.Data;
-using SharpOutcome.HttpApiExample.Services;
-using SharpOutcome.HttpApiExample.Utils;
+using SharpOutcome.HttpApiExample.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,18 +25,24 @@ await using (var dbContext = new BookDbContext(optionsBuilder.Options))
 
 builder.Services.AddDbContext<BookDbContext>(opts => opts.UseSqlite(connectionString));
 
-builder.Services.AddScoped<IBookService, BookService>();
-builder.Services
-    .AddControllers(opts =>
-    {
-        opts.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
-        opts.OutputFormatters.RemoveType<StringOutputFormatter>();
-    })
-    .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase);
+
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = null;
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(
+        namingPolicy: JsonNamingPolicy.CamelCase,
+        allowIntegerValues: false)
+    );
+});
 
 
+builder.Services.RegisterBookApiEndpointServices();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(o => o.SupportNonNullableReferenceTypes());
+
+ValidatorOptions.Global.DisplayNameResolver = (_, member, _) =>
+    member is not null ? JsonNamingPolicy.CamelCase.ConvertName(member.Name) : null;
 
 var app = builder.Build();
 
@@ -48,6 +54,5 @@ app.Lifetime.ApplicationStopping.Register(() =>
 
 app.UseSwagger();
 app.UseSwaggerUI(o => o.EnableTryItOutByDefault());
-
-app.MapControllers();
+app.MapBookApiEndpoints();
 app.Run();
