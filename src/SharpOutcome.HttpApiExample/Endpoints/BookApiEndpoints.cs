@@ -17,24 +17,21 @@ public struct BookApiEndpoints : IApiEndpoint
     {
         var bookRoute = routes.MapGroup("api/books/");
 
-        bookRoute.MapPost("", CreateBook);
+        bookRoute.MapPost("", CreateBook)
+            .AddEndpointFilter<FluentValidationFilter<BookRequest>>();
+        
         bookRoute.MapGet("{id:int}", GetSingleBook);
         bookRoute.MapGet("", GetAllBooks);
-        bookRoute.MapPut("{id:int}", UpdateBook);
+        
+        bookRoute.MapPut("{id:int}", UpdateBook)
+            .AddEndpointFilter<FluentValidationFilter<BookRequest>>();
+        
         bookRoute.MapDelete("{id:int}", DeleteBook);
     }
 
 
-    public static async Task<IResult> CreateBook(BookRequest dto,
-        IValidator<BookRequest> bookRequestValidator, IBookService bookService)
+    public static async Task<IResult> CreateBook(BookRequest dto, IBookService bookService)
     {
-        var validationResult = await bookRequestValidator.ValidateAsync(dto);
-        if (validationResult.IsValid is false)
-        {
-            return ApiEndpointResponse.Send(StatusCodes.Status400BadRequest,
-                FluentValidationUtils.MapErrors(validationResult.Errors));
-        }
-
         var result = await bookService.CreateAsync(dto);
 
         return result.Match(
@@ -60,16 +57,8 @@ public struct BookApiEndpoints : IApiEndpoint
     }
 
 
-    public static async Task<IResult> UpdateBook(int id, BookRequest dto,
-        IValidator<BookRequest> bookRequestValidator, IBookService bookService)
+    public static async Task<IResult> UpdateBook(int id, BookRequest dto, IBookService bookService)
     {
-        var validationResult = await bookRequestValidator.ValidateAsync(dto);
-        if (validationResult.IsValid is false)
-        {
-            return ApiEndpointResponse.Send(StatusCodes.Status400BadRequest,
-                FluentValidationUtils.MapErrors(validationResult.Errors));
-        }
-
         var result = await bookService.UpdateAsync(id, dto);
 
         return result.Match(

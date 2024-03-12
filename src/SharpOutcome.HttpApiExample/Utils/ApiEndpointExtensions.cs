@@ -6,8 +6,9 @@ public static class ApiEndpointExtensions
 {
     public static IServiceCollection MapApiEndpointServices(this IServiceCollection services, Assembly assembly)
     {
-        var types = assembly.GetTypes()
-            .Where(t => t.GetInterfaces().Contains(typeof(IApiEndpoint)) && t.IsAbstract is false);
+        var types = assembly.GetTypes().Where(t =>
+            t is { IsAbstract: false, IsInterface: false } && t.IsAssignableTo(typeof(IApiEndpoint)));
+
 
         foreach (var type in types)
         {
@@ -26,8 +27,8 @@ public static class ApiEndpointExtensions
 
     public static IEndpointRouteBuilder MapApiEndpoints(this IEndpointRouteBuilder endpoints, Assembly assembly)
     {
-        var types = assembly.GetTypes()
-            .Where(t => t.GetInterfaces().Contains(typeof(IApiEndpoint)) && t.IsAbstract is false);
+        var types = assembly.GetTypes().Where(t =>
+            t is { IsAbstract: false, IsInterface: false } && t.IsAssignableTo(typeof(IApiEndpoint)));
 
         foreach (var type in types)
         {

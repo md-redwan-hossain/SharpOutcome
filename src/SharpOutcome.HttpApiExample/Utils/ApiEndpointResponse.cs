@@ -1,8 +1,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.WebUtilities;
-using SharpOutcome.HttpApiExample.Utils;
 
-namespace SharpOutcome.HttpApiExample.Endpoints;
+namespace SharpOutcome.HttpApiExample.Utils;
 
 public static class ApiEndpointResponse
 {
