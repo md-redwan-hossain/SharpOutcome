@@ -4,14 +4,20 @@ namespace SharpOutcome.HttpApiExample.Utils;
 
 public static class ApiEndpointExtensions
 {
-    public static IServiceCollection MapEndpointServices(this IServiceCollection services, Assembly assembly)
+    public static IServiceCollection MapApiEndpointServices(this IServiceCollection services, Assembly assembly)
     {
         var types = assembly.GetTypes()
             .Where(t => t.GetInterfaces().Contains(typeof(IApiEndpoint)) && t.IsAbstract is false);
 
         foreach (var type in types)
         {
-            var instance = ActivatorUtilities.CreateInstance(services.BuildServiceProvider(), type) as IApiEndpoint;
+            var constructors = type.GetConstructors();
+            if (constructors.Length > 1 || (constructors.Length == 1 && constructors[0].GetParameters().Length > 0))
+            {
+                throw new InvalidOperationException($"Type {type.FullName} must only have a empty constructor.");
+            }
+
+            var instance = Activator.CreateInstance(type) as IApiEndpoint;
             instance?.RegisterServices(services);
         }
 
@@ -25,7 +31,13 @@ public static class ApiEndpointExtensions
 
         foreach (var type in types)
         {
-            var instance = ActivatorUtilities.CreateInstance(endpoints.ServiceProvider, type) as IApiEndpoint;
+            var constructors = type.GetConstructors();
+            if (constructors.Length > 1 || (constructors.Length == 1 && constructors[0].GetParameters().Length > 0))
+            {
+                throw new InvalidOperationException($"Type {type.FullName} must only have a empty constructor.");
+            }
+
+            var instance = Activator.CreateInstance(type) as IApiEndpoint;
             instance?.DefineRoutes(endpoints);
         }
 

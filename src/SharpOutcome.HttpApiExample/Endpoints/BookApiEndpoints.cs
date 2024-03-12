@@ -5,7 +5,7 @@ using SharpOutcome.HttpApiExample.Utils;
 
 namespace SharpOutcome.HttpApiExample.Endpoints;
 
-public class BookApiEndpoints : IApiEndpoint
+public struct BookApiEndpoints : IApiEndpoint
 {
     public void RegisterServices(IServiceCollection services)
     {
@@ -31,15 +31,15 @@ public class BookApiEndpoints : IApiEndpoint
         var validationResult = await bookRequestValidator.ValidateAsync(dto);
         if (validationResult.IsValid is false)
         {
-            return MinimalApiResponse.Send(StatusCodes.Status400BadRequest,
+            return ApiEndpointResponse.Send(StatusCodes.Status400BadRequest,
                 FluentValidationUtils.MapErrors(validationResult.Errors));
         }
 
         var result = await bookService.CreateAsync(dto);
 
         return result.Match(
-            entity => MinimalApiResponse.Send(StatusCodes.Status201Created, entity),
-            err => MinimalApiResponse.Send(err)
+            entity => ApiEndpointResponse.Send(StatusCodes.Status201Created, entity),
+            err => ApiEndpointResponse.Send(err)
         );
     }
 
@@ -48,15 +48,15 @@ public class BookApiEndpoints : IApiEndpoint
         var result = await bookService.GetOneAsync(id);
 
         return result.Match(
-            entity => MinimalApiResponse.Send(StatusCodes.Status200OK, entity),
-            err => MinimalApiResponse.Send(err)
+            entity => ApiEndpointResponse.Send(StatusCodes.Status200OK, entity),
+            err => ApiEndpointResponse.Send(err)
         );
     }
 
     public static async Task<IResult> GetAllBooks(IBookService bookService)
     {
         var data = await bookService.GetAllAsync();
-        return MinimalApiResponse.Send(StatusCodes.Status200OK, data);
+        return ApiEndpointResponse.Send(StatusCodes.Status200OK, data);
     }
 
 
@@ -66,15 +66,15 @@ public class BookApiEndpoints : IApiEndpoint
         var validationResult = await bookRequestValidator.ValidateAsync(dto);
         if (validationResult.IsValid is false)
         {
-            return MinimalApiResponse.Send(StatusCodes.Status400BadRequest,
+            return ApiEndpointResponse.Send(StatusCodes.Status400BadRequest,
                 FluentValidationUtils.MapErrors(validationResult.Errors));
         }
 
         var result = await bookService.UpdateAsync(id, dto);
 
         return result.Match(
-            entity => MinimalApiResponse.Send(StatusCodes.Status200OK, entity),
-            err => MinimalApiResponse.Send(err)
+            entity => ApiEndpointResponse.Send(StatusCodes.Status200OK, entity),
+            err => ApiEndpointResponse.Send(err)
         );
     }
 
@@ -83,8 +83,8 @@ public class BookApiEndpoints : IApiEndpoint
         var result = await bookService.RemoveAsync(id);
 
         return result.Match(
-            success => MinimalApiResponse.Send(success),
-            err => MinimalApiResponse.Send(err)
+            success => ApiEndpointResponse.Send(success),
+            err => ApiEndpointResponse.Send(err)
         );
     }
 }

@@ -4,7 +4,7 @@ using SharpOutcome.HttpApiExample.Utils;
 
 namespace SharpOutcome.HttpApiExample.Endpoints;
 
-public static class MinimalApiResponse
+public static class ApiEndpointResponse
 {
     public static IResult Send(int code, object data, string message,
         JsonSerializerOptions? jsonSerializerOptions = null,

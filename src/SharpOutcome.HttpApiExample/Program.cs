@@ -38,9 +38,10 @@ builder.Services.Configure<JsonOptions>(options =>
 });
 
 
-builder.Services.MapEndpointServices(Assembly.GetExecutingAssembly());
+builder.Services.MapApiEndpointServices(Assembly.GetExecutingAssembly());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(o => o.SupportNonNullableReferenceTypes());
+
 
 ValidatorOptions.Global.DisplayNameResolver = (_, member, _) =>
     member is not null ? JsonNamingPolicy.CamelCase.ConvertName(member.Name) : null;
