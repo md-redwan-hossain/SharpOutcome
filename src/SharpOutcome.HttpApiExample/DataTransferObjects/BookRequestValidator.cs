@@ -22,6 +22,8 @@ public class BookRequestValidator : AbstractValidator<BookRequest>
             .NotEmpty()
             .MaximumLength(256);
 
-        RuleFor(x => x.Price).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.Price)
+            .NotNull()
+            .GreaterThan(0);
     }
 }
