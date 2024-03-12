@@ -5,23 +5,23 @@ using SharpOutcome.HttpApiExample.Utils;
 
 namespace SharpOutcome.HttpApiExample.Endpoints;
 
-public static class BookApiEndpoints
+public class BookApiEndpoints : IApiEndpoint
 {
-    public static void RegisterBookApiEndpointServices(this IServiceCollection services)
+    public void RegisterServices(IServiceCollection services)
     {
         services.AddScoped<IValidator<BookRequest>, BookRequestValidator>();
         services.AddScoped<IBookService, BookService>();
     }
 
-    public static void MapBookApiEndpoints(this IEndpointRouteBuilder app)
+    public void DefineRoutes(IEndpointRouteBuilder routes)
     {
-        var route = app.MapGroup("api/books/");
+        var bookRoute = routes.MapGroup("api/books/");
 
-        route.MapPost("", CreateBook);
-        route.MapGet("{id:int}", GetSingleBook);
-        route.MapGet("", GetAllBooks);
-        route.MapPut("{id:int}", UpdateBook);
-        route.MapDelete("{id:int}", DeleteBook);
+        bookRoute.MapPost("", CreateBook);
+        bookRoute.MapGet("{id:int}", GetSingleBook);
+        bookRoute.MapGet("", GetAllBooks);
+        bookRoute.MapPut("{id:int}", UpdateBook);
+        bookRoute.MapDelete("{id:int}", DeleteBook);
     }
 
 

@@ -1,10 +1,11 @@
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using SharpOutcome.HttpApiExample.Data;
-using SharpOutcome.HttpApiExample.Endpoints;
+using SharpOutcome.HttpApiExample.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +38,7 @@ builder.Services.Configure<JsonOptions>(options =>
 });
 
 
-builder.Services.RegisterBookApiEndpointServices();
+builder.Services.MapEndpointServices(Assembly.GetExecutingAssembly());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(o => o.SupportNonNullableReferenceTypes());
 
@@ -54,5 +55,5 @@ app.Lifetime.ApplicationStopping.Register(() =>
 
 app.UseSwagger();
 app.UseSwaggerUI(o => o.EnableTryItOutByDefault());
-app.MapBookApiEndpoints();
+app.MapApiEndpoints(Assembly.GetExecutingAssembly());
 app.Run();
