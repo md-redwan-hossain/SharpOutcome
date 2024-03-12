@@ -1,4 +1,5 @@
 using FluentValidation;
+using SharpOutcome.HttpApiExample.Data;
 using SharpOutcome.HttpApiExample.DataTransferObjects;
 using SharpOutcome.HttpApiExample.Services;
 using SharpOutcome.HttpApiExample.Utils;
@@ -18,15 +19,24 @@ public struct BookApiEndpoints : IApiEndpoint
         var bookRoute = routes.MapGroup("api/books/");
 
         bookRoute.MapPost("", CreateBook)
-            .AddEndpointFilter<FluentValidationFilter<BookRequest>>();
-        
-        bookRoute.MapGet("{id:int}", GetSingleBook);
-        bookRoute.MapGet("", GetAllBooks);
-        
+            .AddEndpointFilter<FluentValidationFilter<BookRequest>>()
+            .Produces<ApiResponse<Book>>(statusCode: StatusCodes.Status201Created)
+            .Produces<ApiResponse>(statusCode: StatusCodes.Status400BadRequest);
+
+        bookRoute.MapGet("{id:int}", GetSingleBook)
+            .Produces<ApiResponse<Book>>(statusCode: StatusCodes.Status200OK)
+            .Produces<ApiResponse>(statusCode: StatusCodes.Status404NotFound);
+
+        bookRoute.MapGet("", GetAllBooks).Produces<ApiResponse<IList<Book>>>();
+
         bookRoute.MapPut("{id:int}", UpdateBook)
-            .AddEndpointFilter<FluentValidationFilter<BookRequest>>();
-        
-        bookRoute.MapDelete("{id:int}", DeleteBook);
+            .AddEndpointFilter<FluentValidationFilter<BookRequest>>()
+            .Produces<ApiResponse<Book>>(statusCode: StatusCodes.Status200OK)
+            .Produces<ApiResponse>(statusCode: StatusCodes.Status400BadRequest);
+
+        bookRoute.MapDelete("{id:int}", DeleteBook)
+            .Produces(statusCode: StatusCodes.Status204NoContent)
+            .Produces<ApiResponse>(statusCode: StatusCodes.Status404NotFound);
     }
 
 

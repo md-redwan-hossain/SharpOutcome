@@ -40,7 +40,12 @@ builder.Services.Configure<JsonOptions>(options =>
 
 builder.Services.MapApiEndpointServices(Assembly.GetExecutingAssembly());
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(o => o.SupportNonNullableReferenceTypes());
+builder.Services.AddSwaggerGen(o =>
+{
+    o.SupportNonNullableReferenceTypes();
+    o.UseAllOfToExtendReferenceSchemas();
+    o.SchemaFilter<ApiResponseSchemaFilter>();
+});
 
 
 ValidatorOptions.Global.DisplayNameResolver = (_, member, _) =>
