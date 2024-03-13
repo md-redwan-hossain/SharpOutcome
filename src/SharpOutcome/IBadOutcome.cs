@@ -19,12 +19,13 @@ namespace SharpOutcome
     /// <summary>
     /// Enforces a contract for bad outcome.
     /// </summary>
-    public interface IBadOutcome<out T>
+    /// <typeparam name="TOutcomeTag">The type of the unique tag of the bad outcome.</typeparam>
+    public interface IBadOutcome<out TOutcomeTag>
     {
         /// <summary>
         /// Gets the unique tag of the bad outcome.
         /// </summary>
-        T Tag { get; }
+        TOutcomeTag Tag { get; }
 
         /// <summary>
         /// Gets the unique tag for the bad outcome.

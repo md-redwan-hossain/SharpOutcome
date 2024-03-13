@@ -12,8 +12,7 @@ namespace SharpOutcome
     /// <summary>
     /// Represents a good outcome.
     /// </summary>
-    /// <typeparam name="T">The generic type of the good outcome.</typeparam>
-    /// <param name="Tag">The unique tag of the good outcome.</param>
+    /// <typeparam name="TOutcomeTag">The type of the good outcome.</typeparam>
     /// <param name="Reason">The reason for the good outcome (optional).</param>
-    public record GoodOutcome<T>(T Tag, string? Reason = null) : IGoodOutcome<T>;
+    public record GoodOutcome<TOutcomeTag>(TOutcomeTag Tag, string? Reason = null) : IGoodOutcome<TOutcomeTag>;
 }

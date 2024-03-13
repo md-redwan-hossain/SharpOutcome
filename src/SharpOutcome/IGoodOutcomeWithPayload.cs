@@ -1,14 +1,20 @@
 namespace SharpOutcome
 {
     /// <summary>
-    /// Enforces a contract for good outcome.
+    /// Enforces a contract for good outcome with payload of type <typeparamref name="TPayload"/>.
     /// </summary>
-    public interface IGoodOutcome
+    public interface IGoodOutcomeWithPayload<out TPayload>
     {
         /// <summary>
         /// Gets the unique tag of the good outcome.
         /// </summary>
         GoodOutcomeTag Tag { get; }
+
+
+        /// <summary>
+        /// Gets the Payload with the good outcome.
+        /// </summary>
+        TPayload Payload { get; }
 
         /// <summary>
         /// Gets the reason for the good outcome.
@@ -18,15 +24,19 @@ namespace SharpOutcome
 
 
     /// <summary>
-    /// Enforces a contract for good outcome.
+    /// Enforces a contract for good outcome with payload of type <typeparamref name="TPayload"/>.
     /// </summary>
-    /// <typeparam name="TOutcomeTag">The type of the unique tag of the good outcome.</typeparam>
-    public interface IGoodOutcome<out TOutcomeTag>
+    public interface IGoodOutcomeWithPayload<out TPayload, out TOutcomeTag>
     {
         /// <summary>
         /// Gets the unique tag of the good outcome.
         /// </summary>
         TOutcomeTag Tag { get; }
+
+        /// <summary>
+        /// Gets the Payload with the good outcome.
+        /// </summary>
+        TPayload Payload { get; }
 
         /// <summary>
         /// Gets the reason for the good outcome.

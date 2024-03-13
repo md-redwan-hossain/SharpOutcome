@@ -24,6 +24,7 @@ namespace SharpOutcome
         NotReadyYet,
         NotVerified,
         Null,
+        Outdated,
         Rejected,
         Stalled,
         Timeout,

@@ -9,6 +9,7 @@ namespace SharpOutcome
         Accepted = 1,
         Authorized,
         Authenticated,
+        Available,
         Completed,
         Confirmed,
         Created,
