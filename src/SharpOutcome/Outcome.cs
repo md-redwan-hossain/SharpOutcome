@@ -13,11 +13,20 @@ namespace SharpOutcome
     public class Outcome<TGoodOutcome, TBadOutcome>
         where TGoodOutcome : notnull
         where TBadOutcome : notnull
+
     {
         private readonly TGoodOutcome? _goodOutcome;
         private readonly TBadOutcome? _badOutcome;
-        public bool IsBadOutcome { get; }
+
+        /// <summary>
+        /// Gets a boolean value indicating whether the outcome is a good outcome.
+        /// </summary>
         public bool IsGoodOutcome { get; }
+
+        /// <summary>
+        /// Gets a boolean value indicating whether the outcome is a bad outcome.
+        /// </summary>
+        public bool IsBadOutcome { get; }
 
         private Outcome(TGoodOutcome goodOutcome)
         {
