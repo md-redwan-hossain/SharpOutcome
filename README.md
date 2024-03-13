@@ -16,8 +16,7 @@ For `TGoodOutcome` and `TBadOutcome`, you can use any **non-nullable type**. **N
 but not `FooBar?` or `Nullable<FooBar>`. This is intentional because nullability can be treated as a bad outcome.
 
 For convenience, `IGoodOutcome`, `IBadOutcome`, `IGoodOutcomeWithPayload`, `IBadOutcomeWithPayload` interfaces are
-provided along with their concrete
-implementations `GoodOutcome`,`BadOutcome`, `GoodOutcomeWithPayload`, `BadOutcomeWithPayload`.
+provided along with their concrete implementations `GoodOutcome`,`BadOutcome`, `GoodOutcomeWithPayload`, `BadOutcomeWithPayload`.
 
 Since `TGoodOutcome` and `TBadOutcome` can take any **non-nullable type**, it is your responsibility to use them
 properly. No one will stop you from flipping the semantics. For example, you can use any **non-nullable type**
@@ -27,10 +26,10 @@ for `TBadOutcome` that is meant for something good or success, but you shouldn't
 
 ### Use Cases
 
-- As method parameter value.
-- Method return value.
-- A complete REST API with CRUD functionality example is also given to showcase the usefulness of SharpOutcome. Source
-  code is available [here.](https://github.com/md-redwan-hossain/SharpOutcome/tree/main/src/SharpOutcome.HttpApiExample)
+-   As method parameter value.
+-   Method return value.
+-   A complete REST API with CRUD functionality example is also given to showcase the usefulness of SharpOutcome. Source
+    code is available [here.](https://github.com/md-redwan-hossain/SharpOutcome/tree/main/src/SharpOutcome.HttpApiExample)
 
 Here's is an example with a service class method:
 
