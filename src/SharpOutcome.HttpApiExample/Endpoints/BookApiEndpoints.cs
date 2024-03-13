@@ -53,7 +53,7 @@ public struct BookApiEndpoints : IApiEndpoint
     public static async Task<IResult> GetSingleBook(int id, IBookService bookService)
     {
         var result = await bookService.GetOneAsync(id);
-
+        
         return result.Match(
             entity => ApiEndpointResponse.Send(StatusCodes.Status200OK, entity),
             err => ApiEndpointResponse.Send(err)

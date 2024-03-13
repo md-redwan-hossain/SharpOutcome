@@ -14,8 +14,8 @@ type `TGoodOutcome` or a bad outcome of type `TBadOutcome`.
 
 For `TGoodOutcome` and `TBadOutcome`, you can use any **non-nullable type**. **Non-nullable** means you can use `FooBar`
 but not `FooBar?` or `Nullable<FooBar>`. This is intentional because nullability can be treated as a bad outcome. For
-convenience, `IGoodOutcome` and `IBadOutcome` are provided along with their concrete implementations `GoodOutcome`
-and `BadOutcome`.
+convenience, `IGoodOutcome`, `IBadOutcome`, `IGoodOutcomeWithPayload`, `IBadOutcomeWithPayload` interfaces are provided
+along with their concrete implementations `GoodOutcome`,`BadOutcome`, `GoodOutcomeWithPayload`, `BadOutcomeWithPayload`.
 
 Since `TGoodOutcome` and `TBadOutcome` can take any **non-nullable type**, it is your responsibility to use them
 properly. No one will stop you from flipping the semantics. For example, you can use any **non-nullable type**
@@ -139,6 +139,10 @@ await result.SwitchAsync(
 ```
 
 ---
+
+#### `IsGoodOutcome` and `IsBadOutcome`
+
+The `IsGoodOutcome` and `IsBadOutcome` get-only properties denote the status of the resolved outcome.
 
 #### `TryPickGoodOutcome` and `TryPickBadOutcome`
 
