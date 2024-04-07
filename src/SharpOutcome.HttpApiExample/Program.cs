@@ -38,7 +38,7 @@ builder.Services.Configure<JsonOptions>(options =>
 });
 
 
-builder.Services.MapApiEndpointServices(Assembly.GetExecutingAssembly());
+builder.Services.MapApiEndpointServicesFromAssembly(Assembly.GetExecutingAssembly());
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(o =>
 {
@@ -61,5 +61,5 @@ app.Lifetime.ApplicationStopping.Register(() =>
 
 app.UseSwagger();
 app.UseSwaggerUI(o => o.EnableTryItOutByDefault());
-app.MapApiEndpoints(Assembly.GetExecutingAssembly());
+app.MapApiEndpointsFromAssembly(Assembly.GetExecutingAssembly());
 app.Run();

@@ -4,7 +4,7 @@ namespace SharpOutcome.HttpApiExample.Utils;
 
 public static class ApiEndpointExtensions
 {
-    public static IServiceCollection MapApiEndpointServices(this IServiceCollection services, Assembly assembly)
+    public static IServiceCollection MapApiEndpointServicesFromAssembly(this IServiceCollection services, Assembly assembly)
     {
         var types = assembly.GetTypes().Where(t =>
             t is { IsAbstract: false, IsInterface: false } && t.IsAssignableTo(typeof(IApiEndpoint)));
@@ -25,7 +25,7 @@ public static class ApiEndpointExtensions
         return services;
     }
 
-    public static IEndpointRouteBuilder MapApiEndpoints(this IEndpointRouteBuilder endpoints, Assembly assembly)
+    public static IEndpointRouteBuilder MapApiEndpointsFromAssembly(this IEndpointRouteBuilder endpoints, Assembly assembly)
     {
         var types = assembly.GetTypes().Where(t =>
             t is { IsAbstract: false, IsInterface: false } && t.IsAssignableTo(typeof(IApiEndpoint)));

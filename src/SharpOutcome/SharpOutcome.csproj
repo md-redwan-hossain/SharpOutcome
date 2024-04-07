@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFrameworks>net5.0;net6.0;net7.0;net8.0</TargetFrameworks>
         <Nullable>enable</Nullable>
-        <Version>0.0.4</Version>
+        <Version>0.0.6</Version>
         <Title>SharpOutcome</Title>
         <Authors>Md. Redwan Hossain</Authors>
         <Copyright>Copyright (c) Md. Redwan Hossain</Copyright>
@@ -15,7 +15,7 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <NoWarn>CS1591</NoWarn>
         <DocumentationFile Condition="'$(Configuration)'=='Release'">bin\$(Configuration)\$(TargetFramework)\SharpOutcome.xml</DocumentationFile>
-        <Description>SharpOutcome offers an implementation of the Result pattern featuring a straightforward API, enabling seamless code flow management without the need for exceptions.</Description>
+        <Description>SharpOutcome is a C# library that offers an implementation of the Result pattern featuring a straightforward API, enabling seamless code flow management without the need for exceptions.</Description>
     </PropertyGroup>
 
     <ItemGroup>

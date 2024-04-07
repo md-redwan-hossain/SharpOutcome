@@ -15,8 +15,7 @@ type `TGoodOutcome` or a bad outcome of type `TBadOutcome`.
 For `TGoodOutcome` and `TBadOutcome`, you can use any **non-nullable type**. **Non-nullable** means you can use `FooBar`
 but not `FooBar?` or `Nullable<FooBar>`. This is intentional because nullability can be treated as a bad outcome.
 
-For convenience, `IGoodOutcome`, `IBadOutcome`, `IGoodOutcomeWithPayload`, `IBadOutcomeWithPayload` interfaces are
-provided along with their concrete implementations `GoodOutcome`,`BadOutcome`, `GoodOutcomeWithPayload`, `BadOutcomeWithPayload`.
+For convenience, [helper interfaces along with their concrete implementations](#helpers) are provided.
 
 Since `TGoodOutcome` and `TBadOutcome` can take any **non-nullable type**, it is your responsibility to use them
 properly. No one will stop you from flipping the semantics. For example, you can use any **non-nullable type**
@@ -30,83 +29,7 @@ for `TBadOutcome` that is meant for something good or success, but you shouldn't
 -   Method return value.
 -   A complete REST API with CRUD functionality example is also given to showcase the usefulness of SharpOutcome. Source
     code is available [here.](https://github.com/md-redwan-hossain/SharpOutcome/tree/main/src/SharpOutcome.HttpApiExample)
-
-Here's is an example with a service class method:
-
-```csharp
-public async Task<Outcome<Book, IBadOutcome>> UpdateAsync(int id, BookRequest dto)
-{
-    try
-    {
-        Book? entityToUpdate = await _bookDbContext.Books.FindAsync(id);
-        if (entityToUpdate is null) return new BadOutcome(BadOutcomeTag.NotFound);
-
-        await dto.BuildAdapter().AdaptToAsync(entityToUpdate);
-        _bookDbContext.Books.Attach(entityToUpdate);
-        _bookDbContext.Entry(entityToUpdate).State = EntityState.Modified;
-        await _bookDbContext.SaveChangesAsync();
-        return entityToUpdate;
-    }
-    catch (Exception e)
-    {
-        Console.WriteLine(e);
-        return new BadOutcome(BadOutcomeTag.Unexpected);
-    }
-}
-```
-
-The service class can be consumed in a controller class like the following way using the `MatchAsync` method:
-
-```csharp
-[HttpPut("{id:int}")]
-public async Task<IActionResult> PutBook(int id, BookRequest dto)
-{
-    if (!ModelState.IsValid) return ResponseMaker(HttpStatusCode.BadRequest);
-
-    Outcome<Book, IBadOutcome> result = await _bookService.UpdateAsync(id, dto);
-
-    return result.Match<IActionResult>(
-        entity => ResponseMaker(HttpStatusCode.OK, entity),
-        err => ResponseMaker(err)
-    );
-}
-
-private IActionResult ResponseMaker(IBadOutcome error)
-{
-    var code = error.Tag switch
-    {
-        BadOutcomeTag.Failure => HttpStatusCode.InternalServerError,
-        BadOutcomeTag.Unexpected => HttpStatusCode.InternalServerError,
-        BadOutcomeTag.Validation => HttpStatusCode.BadRequest,
-        BadOutcomeTag.Conflict => HttpStatusCode.Conflict,
-        BadOutcomeTag.NotFound => HttpStatusCode.NotFound,
-        BadOutcomeTag.Unauthorized => HttpStatusCode.Unauthorized,
-        BadOutcomeTag.Forbidden => HttpStatusCode.Forbidden,
-        _ => HttpStatusCode.InternalServerError,
-    };
-
-    return ResponseMaker(code, null, error.Reason);
-}
-
-private IActionResult ResponseMaker(HttpStatusCode code, object? data = null, string? message = null)
-{
-    if (code == HttpStatusCode.NoContent) return NoContent();
-
-    var castedCode = (int)code;
-    var isSuccess = castedCode is >= 200 and < 300;
-    var res = new
-    {
-        Success = isSuccess,
-        Message = message ?? ReasonPhrases.GetReasonPhrase(castedCode),
-        Code = castedCode,
-        Data = data
-    };
-
-    return StatusCode(castedCode, res);
-}
-```
-
----
+-   [Example code snippets](#example-code-snippets).
 
 ### Available API:
 
@@ -182,3 +105,157 @@ return result.TryPickGoodOutcome(out var good, out var bad)
 
 The `TryPickBadOutcome` method and its overload work in a similar way of `TryPickGoodOutcome`, but they try to extract
 the bad outcome instead of the good outcome.
+
+---
+
+### Helpers:
+
+---
+
+For convenience, `IGoodOutcome`, `IBadOutcome`, `IGoodOutcomeWithPayload`, `IBadOutcomeWithPayload` interfaces are
+provided along with their concrete implementations `GoodOutcome`,`BadOutcome`, `GoodOutcomeWithPayload`, `BadOutcomeWithPayload`.
+
+```csharp
+public interface IGoodOutcome
+{
+    GoodOutcomeTag Tag { get; }
+    string? Reason { get; }
+}
+
+
+    public interface IGoodOutcome<out TOutcomeTag>
+{
+    TOutcomeTag Tag { get; }
+    string? Reason { get; }
+}
+```
+
+```csharp
+public interface IGoodOutcomeWithPayload<out TPayload>
+{
+
+    GoodOutcomeTag Tag { get; }
+    TPayload Payload { get; }
+    string? Reason { get; }
+}
+
+
+public interface IGoodOutcomeWithPayload<out TPayload, out TOutcomeTag>
+{
+    TOutcomeTag Tag { get; }
+    TPayload Payload { get; }
+    string? Reason { get; }
+}
+```
+
+```csharp
+public interface IBadOutcome
+{
+    BadOutcomeTag Tag { get; }
+    string? Reason { get; }
+}
+
+
+public interface IBadOutcome<out TOutcomeTag>
+{
+    TOutcomeTag Tag { get; }
+    string? Reason { get; }
+}
+```
+
+```csharp
+public interface IBadOutcomeWithPayload<out TPayload>
+{
+    BadOutcomeTag Tag { get; }
+    TPayload Payload { get; }
+    string? Reason { get; }
+}
+
+public interface IBadOutcomeWithPayload<out TPayload, out TOutcomeTag>
+{
+    TOutcomeTag Tag { get; }
+    TPayload Payload { get; }
+    string? Reason { get; }
+}
+```
+
+---
+
+### Example Code Snippets:
+
+---
+
+Here's is an example with a service class method:
+
+```csharp
+public async Task<Outcome<Book, IBadOutcome>> UpdateAsync(int id, BookRequest dto)
+{
+    try
+    {
+        Book? entityToUpdate = await _bookDbContext.Books.FindAsync(id);
+        if (entityToUpdate is null) return new BadOutcome(BadOutcomeTag.NotFound);
+
+        await dto.BuildAdapter().AdaptToAsync(entityToUpdate);
+        _bookDbContext.Books.Attach(entityToUpdate);
+        _bookDbContext.Entry(entityToUpdate).State = EntityState.Modified;
+        await _bookDbContext.SaveChangesAsync();
+        return entityToUpdate;
+    }
+    catch (Exception e)
+    {
+        Console.WriteLine(e);
+        return new BadOutcome(BadOutcomeTag.Unexpected);
+    }
+}
+```
+
+The service class can be consumed in a controller class like the following way using the `MatchAsync` method:
+
+```csharp
+[HttpPut("{id:int}")]
+public async Task<IActionResult> PutBook(int id, BookRequest dto)
+{
+    if (!ModelState.IsValid) return ResponseMaker(HttpStatusCode.BadRequest);
+
+    Outcome<Book, IBadOutcome> result = await _bookService.UpdateAsync(id, dto);
+
+    return result.Match<IActionResult>(
+        entity => ResponseMaker(HttpStatusCode.OK, entity),
+        err => ResponseMaker(err)
+    );
+}
+
+private IActionResult ResponseMaker(IBadOutcome error)
+{
+    var code = error.Tag switch
+    {
+        BadOutcomeTag.Failure => HttpStatusCode.InternalServerError,
+        BadOutcomeTag.Unexpected => HttpStatusCode.InternalServerError,
+        BadOutcomeTag.Validation => HttpStatusCode.BadRequest,
+        BadOutcomeTag.Conflict => HttpStatusCode.Conflict,
+        BadOutcomeTag.NotFound => HttpStatusCode.NotFound,
+        BadOutcomeTag.Unauthorized => HttpStatusCode.Unauthorized,
+        BadOutcomeTag.Forbidden => HttpStatusCode.Forbidden,
+        _ => HttpStatusCode.InternalServerError,
+    };
+
+    return ResponseMaker(code, null, error.Reason);
+}
+
+private IActionResult ResponseMaker(HttpStatusCode code, object? data = null, string? message = null)
+{
+    if (code == HttpStatusCode.NoContent) return NoContent();
+
+    var castedCode = (int)code;
+    var isSuccess = castedCode is >= 200 and < 300;
+    var res = new
+    {
+        Success = isSuccess,
+        Message = message ?? ReasonPhrases.GetReasonPhrase(castedCode),
+        Code = castedCode,
+        Data = data
+    };
+
+    return StatusCode(castedCode, res);
+}
+```

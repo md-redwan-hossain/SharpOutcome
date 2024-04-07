@@ -30,6 +30,7 @@ namespace SharpOutcome
 
         private Outcome(TGoodOutcome goodOutcome)
         {
+            RequireNonNull(goodOutcome);
             IsGoodOutcome = true;
             IsBadOutcome = false;
             _goodOutcome = goodOutcome;
@@ -38,6 +39,7 @@ namespace SharpOutcome
 
         private Outcome(TBadOutcome badOutcome)
         {
+            RequireNonNull(badOutcome);
             IsGoodOutcome = false;
             IsBadOutcome = true;
             _badOutcome = badOutcome;
@@ -167,8 +169,8 @@ namespace SharpOutcome
             Func<TBadOutcome, Task<TOutput>> onBadOutcome)
         {
             return IsBadOutcome
-                ? await onBadOutcome(_badOutcome ?? throw new InvalidOperationException())
-                : await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
+                ? await onBadOutcome(_badOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false)
+                : await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false);
         }
 
 
@@ -184,7 +186,7 @@ namespace SharpOutcome
         {
             return IsBadOutcome
                 ? onBadOutcome(_badOutcome ?? throw new InvalidOperationException())
-                : await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
+                : await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false);
         }
 
 
@@ -199,7 +201,7 @@ namespace SharpOutcome
             Func<TBadOutcome, Task<TOutput>> onBadOutcome)
         {
             return IsBadOutcome
-                ? await onBadOutcome(_badOutcome ?? throw new InvalidOperationException())
+                ? await onBadOutcome(_badOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false)
                 : onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
         }
 
@@ -210,8 +212,14 @@ namespace SharpOutcome
         /// <param name="onBadOutcome">The delegate to execute if the outcome is bad.</param>
         public void Switch(Action<TGoodOutcome> onGoodOutcome, Action<TBadOutcome> onBadOutcome)
         {
-            if (IsBadOutcome) onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
-            else onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
+            if (IsBadOutcome)
+            {
+                onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
+            }
+            else
+            {
+                onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
+            }
         }
 
 
@@ -222,8 +230,14 @@ namespace SharpOutcome
         /// <param name="onBadOutcome">The asynchronous delegate to execute if the outcome is bad.</param>
         public async Task SwitchAsync(Func<TGoodOutcome, Task> onGoodOutcome, Func<TBadOutcome, Task> onBadOutcome)
         {
-            if (IsBadOutcome) await onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
-            else await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
+            if (IsBadOutcome)
+            {
+                await onBadOutcome(_badOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false);
+            }
+            else
+            {
+                await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false);
+            }
         }
 
 
@@ -235,8 +249,14 @@ namespace SharpOutcome
         /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task SwitchAsync(Func<TGoodOutcome, Task> onGoodOutcome, Action<TBadOutcome> onBadOutcome)
         {
-            if (IsBadOutcome) onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
-            else await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
+            if (IsBadOutcome)
+            {
+                onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
+            }
+            else
+            {
+                await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false);
+            }
         }
 
 
@@ -247,8 +267,22 @@ namespace SharpOutcome
         /// <param name="onBadOutcome">The asynchronous delegate to execute if the outcome is bad.</param>
         public async Task SwitchAsync(Action<TGoodOutcome> onGoodOutcome, Func<TBadOutcome, Task> onBadOutcome)
         {
-            if (IsBadOutcome) await onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
-            else onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
+            if (IsBadOutcome)
+            {
+                await onBadOutcome(_badOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false);
+            }
+            else
+            {
+                onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
+            }
+        }
+
+        private static void RequireNonNull<T>(T arg)
+        {
+            if (arg is null)
+            {
+                throw new ArgumentNullException(arg?.ToString());
+            }
         }
     }
 }

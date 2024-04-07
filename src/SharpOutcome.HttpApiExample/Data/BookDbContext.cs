@@ -15,7 +15,7 @@ public class BookDbContext(DbContextOptions<BookDbContext> options)
         modelBuilder.Entity<Book>().HasData(GenerateData());
     }
 
-    private static IEnumerable<Book> GenerateData()
+    private static List<Book> GenerateData()
     {
         List<string> genres = ["Fantasy", "Sci-Fi", "Mystery", "Romance", "Horror", "Non-fiction"];
 
