@@ -1,5 +1,6 @@
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using SharpOutcome.Helpers;
 using SharpOutcome.HttpApiExample.Data;
 using SharpOutcome.HttpApiExample.DataTransferObjects;
 

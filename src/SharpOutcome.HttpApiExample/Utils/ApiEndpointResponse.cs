@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.WebUtilities;
+using SharpOutcome.Helpers;
 
 namespace SharpOutcome.HttpApiExample.Utils;
 
