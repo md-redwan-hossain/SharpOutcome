@@ -1,16 +1,17 @@
-- [For convenience, helper interfaces along with their concrete implementations are provided.](#for-convenience-helper-interfaces-along-with-their-concrete-implementations-are-provided)
-    - [Potential Corner Cases](#potential-corner-cases)
-    - [Use Cases](#use-cases)
-    - [Available API](#available-api)
-        - [`Match` and `MatchAsync`](#match-and-matchasync)
-        - [`Switch` and `SwitchAsync`](#switch-and-switchasync)
-        - [`IsGoodOutcome` and `IsBadOutcome`](#isgoodoutcome-and-isbadoutcome)
-        - [`TryPickGoodOutcome(out TGoodOutcome? goodOutcome)`](#trypickgoodoutcomeout-tgoodoutcome-goodoutcome)
-        - [`TryPickGoodOutcome(out TGoodOutcome? goodOutcome, out TBadOutcome? badOutcome)`](#trypickgoodoutcomeout-tgoodoutcome-goodoutcome-out-tbadoutcome-badoutcome)
-        - [`TryPickBadOutcome(out TBadOutcome? badOutcome)`](#trypickbadoutcomeout-tbadoutcome-badoutcome)
-        - [`TryPickBadOutcome(out TGoodOutcome? goodOutcome, out TBadOutcome? badOutcome)`](#trypickbadoutcomeout-tgoodoutcome-goodoutcome-out-tbadoutcome-badoutcome)
-    - [Helpers](#helpers)
-    - [Example Code Snippets](#example-code-snippets)
+- [Installation](#installation)
+- [Introduction](#introduction)
+- [Potential Corner Cases](#potential-corner-cases)
+- [Use Cases](#use-cases)
+- [Available API](#available-api)
+    - [`Match` and `MatchAsync`](#match-and-matchasync)
+    - [`Switch` and `SwitchAsync`](#switch-and-switchasync)
+    - [`IsGoodOutcome` and `IsBadOutcome`](#isgoodoutcome-and-isbadoutcome)
+    - [`TryPickGoodOutcome(out TGoodOutcome? goodOutcome)`](#trypickgoodoutcomeout-tgoodoutcome-goodoutcome)
+    - [`TryPickGoodOutcome(out TGoodOutcome? goodOutcome, out TBadOutcome? badOutcome)`](#trypickgoodoutcomeout-tgoodoutcome-goodoutcome-out-tbadoutcome-badoutcome)
+    - [`TryPickBadOutcome(out TBadOutcome? badOutcome)`](#trypickbadoutcomeout-tbadoutcome-badoutcome)
+    - [`TryPickBadOutcome(out TGoodOutcome? goodOutcome, out TBadOutcome? badOutcome)`](#trypickbadoutcomeout-tgoodoutcome-goodoutcome-out-tbadoutcome-badoutcome)
+- [Helpers](#helpers)
+- [Example Code Snippets](#example-code-snippets)
 
 ---
 
@@ -31,11 +32,10 @@ There are two main types:
 - `ValueOutcome<TGoodOutcome, TBadOutcome>` which is a `readonly record struct`.
 
 Both of them represent an outcome that can either be a good outcome of type `TGoodOutcome` or a bad outcome of
-type `TBadOutcome`.
+type `TBadOutcome`. For `TGoodOutcome` and `TBadOutcome`, you can use any **non-nullable type**. **Non-nullable** means
+you can use `FooBar`but not `FooBar?` or `Nullable<FooBar>`. This is intentional because nullability can be treated as a
+bad outcome. For convenience, [helper interfaces along with their concrete implementations](#helpers) are provided.
 
-For `TGoodOutcome` and `TBadOutcome`, you can use any **non-nullable type**. **Non-nullable** means you can use `FooBar`
-but not `FooBar?` or `Nullable<FooBar>`. This is intentional because nullability can be treated as a bad outcome.
-For convenience, [helper interfaces along with their concrete implementations](#helpers) are provided.
 ---
 
 ### Potential Corner Cases
