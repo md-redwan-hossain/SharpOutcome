@@ -1,39 +1,111 @@
+- [For convenience, helper interfaces along with their concrete implementations are provided.](#for-convenience-helper-interfaces-along-with-their-concrete-implementations-are-provided)
+    - [Potential Corner Cases](#potential-corner-cases)
+    - [Use Cases](#use-cases)
+    - [Available API](#available-api)
+        - [`Match` and `MatchAsync`](#match-and-matchasync)
+        - [`Switch` and `SwitchAsync`](#switch-and-switchasync)
+        - [`IsGoodOutcome` and `IsBadOutcome`](#isgoodoutcome-and-isbadoutcome)
+        - [`TryPickGoodOutcome(out TGoodOutcome? goodOutcome)`](#trypickgoodoutcomeout-tgoodoutcome-goodoutcome)
+        - [`TryPickGoodOutcome(out TGoodOutcome? goodOutcome, out TBadOutcome? badOutcome)`](#trypickgoodoutcomeout-tgoodoutcome-goodoutcome-out-tbadoutcome-badoutcome)
+        - [`TryPickBadOutcome(out TBadOutcome? badOutcome)`](#trypickbadoutcomeout-tbadoutcome-badoutcome)
+        - [`TryPickBadOutcome(out TGoodOutcome? goodOutcome, out TBadOutcome? badOutcome)`](#trypickbadoutcomeout-tgoodoutcome-goodoutcome-out-tbadoutcome-badoutcome)
+    - [Helpers](#helpers)
+    - [Example Code Snippets](#example-code-snippets)
+
+---
+
 ### Installation
 
 To install, run `dotnet add package SharpOutcome` or from [Nuget](https://www.nuget.org/packages/SharpOutcome/)
 
 ---
 
-### Rationale
+### Introduction
 
 `SharpOutcome` offers an implementation of the Result pattern featuring a straightforward API, enabling seamless code
 flow management without the need for exceptions.
 
-The class `Outcome<TGoodOutcome, TBadOutcome>` represents an outcome that can either be a good outcome of
-type `TGoodOutcome` or a bad outcome of type `TBadOutcome`.
+There are two main types:
+
+- `Outcome<TGoodOutcome, TBadOutcome>` which is a `class`.
+- `ValueOutcome<TGoodOutcome, TBadOutcome>` which is a `readonly record struct`.
+
+Both of them represent an outcome that can either be a good outcome of type `TGoodOutcome` or a bad outcome of
+type `TBadOutcome`.
 
 For `TGoodOutcome` and `TBadOutcome`, you can use any **non-nullable type**. **Non-nullable** means you can use `FooBar`
 but not `FooBar?` or `Nullable<FooBar>`. This is intentional because nullability can be treated as a bad outcome.
-
 For convenience, [helper interfaces along with their concrete implementations](#helpers) are provided.
+---
 
-Since `TGoodOutcome` and `TBadOutcome` can take any **non-nullable type**, it is your responsibility to use them
-properly. No one will stop you from flipping the semantics. For example, you can use any **non-nullable type**
-for `TBadOutcome` that is meant for something good or success, but you shouldn't.
+### Potential Corner Cases
+
+- Since `TGoodOutcome` and `TBadOutcome` can take any **non-nullable type**, it is your responsibility to use them
+  properly. No one will stop you from flipping the semantics. For example, you can use any **non-nullable type**
+  for `TBadOutcome` that is meant for something good or success, but you shouldn't.
+
+- `TGoodOutcome` and `TBadOutcome` must be of different type. For example, if a method has `Outcome<string, string>`
+  as the return type, what's the benefit? In this case, you can just simply use `string` as return type.
+
+- Be careful when you return from method. In the following code, you are returning `int` twice. If you are expecting
+  BadOutcome as `string`, this will never happen because nothing is returned which has `string` as data type.
+
+```csharp
+
+ValueOutcome<int, string> Gotcha()
+{
+    int number = RandomNumberGenerator.GetInt32(1, 10);
+
+    if (number % 2 == 0)
+    {
+        return number;
+    }
+
+    return number;
+}
+```
+
+- `ValueOutcome` is added for lowering the pressure on the garbage collector. Since C# enforces a parameterless
+  constructor for `struct` type, no one will stop you doing the following:
+
+```csharp
+ValueOutcome<string, int> MisuseOfValueOutcome()
+{
+    return new ValueOutcome<string, int>();
+}
+```
+
+But you will get `InvalidOperationException`at runtime with the
+message `"Invoking Parameterless constructor is not allowed."`. If you want to enforce it in compile time, simply
+use `Outcome` type which has no public constructor.
+
+The proper use of `ValueOutcome` should be the following:
+
+```csharp
+ValueOutcome<string, int> ProperUseOfValueOutcome()
+{
+    if (RandomNumberGenerator.GetInt32(1, 10) == 5)
+    {
+        return "Ok";
+    }
+
+    return -1;
+}
+```
 
 ---
 
 ### Use Cases
 
--   As method parameter value.
--   Method return value.
--   A complete REST API with CRUD functionality example is also given to showcase the usefulness of SharpOutcome. Source
-    code is available [here.](https://github.com/md-redwan-hossain/SharpOutcome/tree/main/src/SharpOutcome.HttpApiExample)
--   [Example code snippets](#example-code-snippets).
-
-### Available API:
+- As method parameter value.
+- Method return value.
+- A complete REST API with CRUD functionality example is also given to showcase the usefulness of SharpOutcome. Source
+  code is available [here.](https://github.com/md-redwan-hossain/SharpOutcome/tree/main/src/SharpOutcome.HttpApiExample)
+- [Example code snippets](#example-code-snippets).
 
 ---
+
+### Available API
 
 #### `Match` and `MatchAsync`
 
@@ -68,12 +140,7 @@ await result.SwitchAsync(
 
 The `IsGoodOutcome` and `IsBadOutcome` get-only properties denote the status of the resolved outcome.
 
-#### `TryPickGoodOutcome` and `TryPickBadOutcome`
-
-The `TryPickGoodOutcome` and `TryPickBadOutcome` methods try to extract the good or bad outcome from the `Outcome`
-respectively. These methods are overloaded.
-
-##### `TryPickGoodOutcome(out TGoodOutcome? goodOutcome)`
+#### `TryPickGoodOutcome(out TGoodOutcome? goodOutcome)`
 
 This method tries to extract the good outcome from the `Outcome` instance. If the instance represents a good outcome, it
 assigns the good outcome to the `goodOutcome` out parameter and returns true. If the instance represents a bad outcome,
@@ -88,7 +155,7 @@ if (checkConfirmation.TryPickGoodOutcome(out var goodOutcome))
 }
 ```
 
-##### `TryPickGoodOutcome(out TGoodOutcome? goodOutcome, out TBadOutcome? badOutcome)`
+#### `TryPickGoodOutcome(out TGoodOutcome? goodOutcome, out TBadOutcome? badOutcome)`
 
 This overload of `TryPickGoodOutcome` tries to extract both the good and bad outcomes from the `Outcome` instance. If
 the instance represents a good outcome, it assigns the good outcome to the `goodOutcome` out parameter, the default
@@ -103,17 +170,24 @@ return result.TryPickGoodOutcome(out var good, out var bad)
     : Results.BadRequest(bad);
 ```
 
-The `TryPickBadOutcome` method and its overload work in a similar way of `TryPickGoodOutcome`, but they try to extract
+#### `TryPickBadOutcome(out TBadOutcome? badOutcome)`
+
+Functionality is same as [`TryPickGoodOutcome`](#trypickgoodoutcomeout-tgoodoutcome-goodoutcome)but it tries to extract
 the bad outcome instead of the good outcome.
 
+#### `TryPickBadOutcome(out TGoodOutcome? goodOutcome, out TBadOutcome? badOutcome)`
+
+Functionality is same
+as [`TryPickGoodOutcome`](#trypickgoodoutcomeout-tgoodoutcome-goodoutcome-out-tbadoutcome-badoutcome)but it tries to
+extract the bad outcome instead of the good outcome.
+
 ---
 
-### Helpers:
-
----
+### Helpers
 
 For convenience, `IGoodOutcome`, `IBadOutcome`, `IGoodOutcomeWithPayload`, `IBadOutcomeWithPayload` interfaces are
-provided along with their concrete implementations `GoodOutcome`,`BadOutcome`, `GoodOutcomeWithPayload`, `BadOutcomeWithPayload`.
+provided along with their concrete
+implementations `GoodOutcome`,`BadOutcome`, `GoodOutcomeWithPayload`, `BadOutcomeWithPayload`.
 
 ```csharp
 public interface IGoodOutcome
@@ -181,11 +255,9 @@ public interface IBadOutcomeWithPayload<out TPayload, out TOutcomeTag>
 
 ---
 
-### Example Code Snippets:
+### Example Code Snippets
 
----
-
-Here's is an example with a service class method:
+Here is an example with a service class method:
 
 ```csharp
 public async Task<Outcome<Book, IBadOutcome>> UpdateAsync(int id, BookRequest dto)

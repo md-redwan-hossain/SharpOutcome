@@ -7,5 +7,5 @@ public record BookRequest(
     [MaxLength(38)] [Required] string Isbn,
     [MaxLength(256)] [Required] string Genre,
     [MaxLength(256)] [Required] string Author,
-    [Required] int Price
+    [Range(1, int.MaxValue)] [Required] int Price
 );
