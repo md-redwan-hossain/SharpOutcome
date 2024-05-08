@@ -1,7 +1,11 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SharpOutcome.HttpApiExample.Data;
 using SharpOutcome.HttpApiExample.Services;
 using SharpOutcome.HttpApiExample.Utils;
@@ -23,8 +27,8 @@ await using (var dbContext = new BookDbContext(optionsBuilder.Options))
     dbContext.Database.CloseConnection();
 }
 
-
-builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.TryAddScoped<IBookService, BookService>();
+builder.Services.TryAddSingleton<IClientErrorFactory, ClientErrorFactory>();
 
 builder.Services.AddDbContext<BookDbContext>(opts => opts.UseSqlite(connectionString));
 
@@ -34,8 +38,37 @@ builder.Services
     {
         opts.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
         opts.OutputFormatters.RemoveType<StringOutputFormatter>();
+        opts.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
     })
-    .AddJsonOptions(opts => opts.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase);
+    .AddJsonOptions(opts =>
+    {
+        opts.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        opts.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+    })
+    .ConfigureApiBehaviorOptions(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(e => e.Value is { Errors.Count: > 0 })
+                .Select(e => new
+                {
+                    Field = JsonNamingPolicy.CamelCase.ConvertName(e.Key),
+                    Errors = e.Value?.Errors.Select(er => er.ErrorMessage)
+                })
+                .ToList();
+
+            var result = new ApiResponse
+            {
+                Code = StatusCodes.Status400BadRequest,
+                Success = false,
+                Message = "One or more validation errors occurred.",
+                Data = errors
+            };
+
+            return new BadRequestObjectResult(result);
+        };
+    });
 
 
 builder.Services.AddEndpointsApiExplorer();
