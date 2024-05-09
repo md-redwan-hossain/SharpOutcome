@@ -83,7 +83,6 @@ public class BookService : IBookService
             _bookDbContext.Books.Remove(entityToDelete);
             await _bookDbContext.SaveChangesAsync();
 
-            return new ValueOutcome<IGoodOutcome, IBadOutcome>(new GoodOutcome(GoodOutcomeTag.Deleted));
             return new GoodOutcome(GoodOutcomeTag.Deleted);
         }
         catch (Exception e)

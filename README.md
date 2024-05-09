@@ -68,7 +68,7 @@ ValueOutcome<string, int> MisuseOfValueOutcome()
 }
 ```
 
-But you will get `InvalidOperationException`at runtime. If you want to enforce it in compile time, simply
+But you will get `InvalidOperationException` at runtime. If you want to enforce it in compile time, simply
 use `Outcome` type which has no parameterless public constructor.
 
 The proper use of `ValueOutcome` should be the following:
