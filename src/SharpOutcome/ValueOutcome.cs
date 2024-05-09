@@ -26,11 +26,13 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
 
     public ValueOutcome()
     {
-        throw new InvalidOperationException("Invoking Parameterless constructor is not allowed.");
+        throw new InvalidOperationException(
+            "Invoking Parameterless constructor breaks the semantics of an ValueOutcome." +
+            " Please use appropriate parameterized constructor or utilize implicit return.");
     }
 
 
-    private ValueOutcome(TGoodOutcome goodOutcome)
+    public ValueOutcome(TGoodOutcome goodOutcome)
     {
         ArgumentNullException.ThrowIfNull(goodOutcome);
         _isGoodOutcome = true;
@@ -39,7 +41,7 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
         _badOutcome = default;
     }
 
-    private ValueOutcome(TBadOutcome badOutcome)
+    public ValueOutcome(TBadOutcome badOutcome)
     {
         ArgumentNullException.ThrowIfNull(badOutcome);
         _isGoodOutcome = false;
@@ -49,7 +51,7 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
     }
 
     /// <summary>
-    /// Implicitly converts a value of type <typeparamref name="TGoodOutcome"/> to an <see cref="ValueOutcome{TGoodOutcome, TBadOutcome}"/> with a good outcome.
+    /// Implicitly converts a value of type <typeparamref name="TGoodOutcome"/> to a <see cref="ValueOutcome{TGoodOutcome, TBadOutcome}"/> with a good outcome.
     /// </summary>
     /// <param name="goodOutcome">The value of type <typeparamref name="TGoodOutcome"/> to convert.</param>
     /// <returns>A <see cref="ValueOutcome{TGoodOutcome, TBadOutcome}"/> with a good outcome.</returns>
@@ -74,11 +76,7 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
     /// </summary>
     public bool IsGoodOutcome()
     {
-        if (_isGoodOutcome is false && _isBadOutcome is false)
-        {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
-        }
-
+        CheckInvalidState();
         return _isGoodOutcome;
     }
 
@@ -88,11 +86,7 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
     /// </summary>
     public bool IsBadOutcome()
     {
-        if (_isGoodOutcome is false && _isBadOutcome is false)
-        {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
-        }
-
+        CheckInvalidState();
         return _isBadOutcome;
     }
 
@@ -104,10 +98,7 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
     /// <returns><c>true</c> if the good outcome exists; otherwise, <c>false</c>.</returns>
     public bool TryPickGoodOutcome([NotNullWhen(true)] out TGoodOutcome? goodOutcome)
     {
-        if (_isGoodOutcome is false && _isBadOutcome is false)
-        {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
-        }
+        CheckInvalidState();
 
         if (_isBadOutcome is false && _goodOutcome is not null)
         {
@@ -126,10 +117,7 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
     /// <returns><c>true</c> if the bad outcome exists; otherwise, <c>false</c>.</returns>
     public bool TryPickBadOutcome([NotNullWhen(true)] out TBadOutcome? badOutcome)
     {
-        if (_isGoodOutcome is false && _isBadOutcome is false)
-        {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
-        }
+        CheckInvalidState();
 
         if (_isBadOutcome && _badOutcome is not null)
         {
@@ -150,10 +138,7 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
     public bool TryPickGoodOutcome([NotNullWhen(true)] out TGoodOutcome? goodOutcome,
         [NotNullWhen(false)] out TBadOutcome? badOutcome)
     {
-        if (_isGoodOutcome is false && _isBadOutcome is false)
-        {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
-        }
+        CheckInvalidState();
 
         if (_isBadOutcome is false && _goodOutcome is not null)
         {
@@ -176,10 +161,7 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
     public bool TryPickBadOutcome([NotNullWhen(true)] out TBadOutcome? badOutcome,
         [NotNullWhen(false)] out TGoodOutcome? goodOutcome)
     {
-        if (_isGoodOutcome is false && _isBadOutcome is false)
-        {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
-        }
+        CheckInvalidState();
 
         if (_isBadOutcome && _badOutcome is not null)
         {
@@ -367,6 +349,14 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
         }
 
         else
+        {
+            throw new InvalidOperationException(InvalidStateErrorMsg);
+        }
+    }
+
+    private void CheckInvalidState()
+    {
+        if (_isGoodOutcome is false && _isBadOutcome is false)
         {
             throw new InvalidOperationException(InvalidStateErrorMsg);
         }

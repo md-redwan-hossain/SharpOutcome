@@ -1,18 +1,18 @@
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using SharpOutcome.HttpApiExample.Controllers;
 using SharpOutcome.HttpApiExample.Data;
 using SharpOutcome.HttpApiExample.Services;
 using SharpOutcome.HttpApiExample.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
-const string connectionString = "DataSource=book_db.sqlite3;Cache=Shared";
+const string connectionString = "DataSource=db.sqlite3;Cache=Shared;";
 
 var optionsBuilder = new DbContextOptionsBuilder<BookDbContext>();
 optionsBuilder.UseSqlite(connectionString);
@@ -33,8 +33,7 @@ builder.Services.TryAddSingleton<IClientErrorFactory, ClientErrorFactory>();
 builder.Services.AddDbContext<BookDbContext>(opts => opts.UseSqlite(connectionString));
 
 
-builder.Services
-    .AddControllers(opts =>
+builder.Services.AddControllers(opts =>
     {
         opts.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
         opts.OutputFormatters.RemoveType<StringOutputFormatter>();
@@ -58,15 +57,11 @@ builder.Services
                 })
                 .ToList();
 
-            var result = new ApiResponse
-            {
-                Code = StatusCodes.Status400BadRequest,
-                Success = false,
-                Message = "One or more validation errors occurred.",
-                Data = errors
-            };
-
-            return new BadRequestObjectResult(result);
+            return context.MakeResponse(
+                StatusCodes.Status400BadRequest,
+                errors,
+                "One or more validation errors occurred."
+            );
         };
     });
 

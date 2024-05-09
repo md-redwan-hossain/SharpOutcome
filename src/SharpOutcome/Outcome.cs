@@ -24,7 +24,7 @@ public class Outcome<TGoodOutcome, TBadOutcome>
         "IsGoodOutcome and IsBadOutcome can't be false at the same time.";
 
 
-    private Outcome(TGoodOutcome goodOutcome)
+    public Outcome(TGoodOutcome goodOutcome)
     {
         ArgumentNullException.ThrowIfNull(goodOutcome);
         _isGoodOutcome = true;
@@ -33,7 +33,7 @@ public class Outcome<TGoodOutcome, TBadOutcome>
         _badOutcome = default;
     }
 
-    private Outcome(TBadOutcome badOutcome)
+    public Outcome(TBadOutcome badOutcome)
     {
         ArgumentNullException.ThrowIfNull(badOutcome);
         _isGoodOutcome = false;
@@ -68,11 +68,7 @@ public class Outcome<TGoodOutcome, TBadOutcome>
     /// </summary>
     public bool IsGoodOutcome()
     {
-        if (_isGoodOutcome is false && _isBadOutcome is false)
-        {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
-        }
-
+        CheckInvalidState();
         return _isGoodOutcome;
     }
 
@@ -82,11 +78,7 @@ public class Outcome<TGoodOutcome, TBadOutcome>
     /// </summary>
     public bool IsBadOutcome()
     {
-        if (_isGoodOutcome is false && _isBadOutcome is false)
-        {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
-        }
-
+        CheckInvalidState();
         return _isBadOutcome;
     }
 
@@ -98,10 +90,7 @@ public class Outcome<TGoodOutcome, TBadOutcome>
     /// <returns><c>true</c> if the good outcome exists; otherwise, <c>false</c>.</returns>
     public bool TryPickGoodOutcome([NotNullWhen(true)] out TGoodOutcome? goodOutcome)
     {
-        if (_isGoodOutcome is false && _isBadOutcome is false)
-        {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
-        }
+        CheckInvalidState();
 
         if (_isBadOutcome is false && _goodOutcome is not null)
         {
@@ -120,10 +109,7 @@ public class Outcome<TGoodOutcome, TBadOutcome>
     /// <returns><c>true</c> if the bad outcome exists; otherwise, <c>false</c>.</returns>
     public bool TryPickBadOutcome([NotNullWhen(true)] out TBadOutcome? badOutcome)
     {
-        if (_isGoodOutcome is false && _isBadOutcome is false)
-        {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
-        }
+        CheckInvalidState();
 
         if (_isBadOutcome && _badOutcome is not null)
         {
@@ -144,10 +130,7 @@ public class Outcome<TGoodOutcome, TBadOutcome>
     public bool TryPickGoodOutcome([NotNullWhen(true)] out TGoodOutcome? goodOutcome,
         [NotNullWhen(false)] out TBadOutcome? badOutcome)
     {
-        if (_isGoodOutcome is false && _isBadOutcome is false)
-        {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
-        }
+        CheckInvalidState();
 
         if (_isBadOutcome is false && _goodOutcome is not null)
         {
@@ -170,10 +153,7 @@ public class Outcome<TGoodOutcome, TBadOutcome>
     public bool TryPickBadOutcome([NotNullWhen(true)] out TBadOutcome? badOutcome,
         [NotNullWhen(false)] out TGoodOutcome? goodOutcome)
     {
-        if (_isGoodOutcome is false && _isBadOutcome is false)
-        {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
-        }
+        CheckInvalidState();
 
         if (_isBadOutcome && _badOutcome is not null)
         {
@@ -361,6 +341,14 @@ public class Outcome<TGoodOutcome, TBadOutcome>
         }
 
         else
+        {
+            throw new InvalidOperationException(InvalidStateErrorMsg);
+        }
+    }
+
+    private void CheckInvalidState()
+    {
+        if (_isGoodOutcome is false && _isBadOutcome is false)
         {
             throw new InvalidOperationException(InvalidStateErrorMsg);
         }

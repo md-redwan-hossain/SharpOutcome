@@ -11,7 +11,7 @@ public class BookService : IBookService
     private readonly BookDbContext _bookDbContext;
     public BookService(BookDbContext bookDbContext) => _bookDbContext = bookDbContext;
 
-    public async Task<Outcome<Book, IBadOutcome>> CreateAsync(BookRequest dto)
+    public async Task<ValueOutcome<Book, IBadOutcome>> CreateAsync(BookRequest dto)
     {
         try
         {
@@ -36,7 +36,7 @@ public class BookService : IBookService
         }
     }
 
-    public async Task<Outcome<Book, IBadOutcome>> UpdateAsync(int id, BookRequest dto)
+    public async Task<ValueOutcome<Book, IBadOutcome>> UpdateAsync(int id, BookRequest dto)
     {
         try
         {
@@ -61,14 +61,14 @@ public class BookService : IBookService
         return await _bookDbContext.Books.ToListAsync();
     }
 
-    public async Task<Outcome<Book, IBadOutcome>> GetOneAsync(int id)
+    public async Task<ValueOutcome<Book, IBadOutcome>> GetOneAsync(int id)
     {
         var entity = await _bookDbContext.Books.FindAsync(id);
         if (entity is null) return new BadOutcome(BadOutcomeTag.NotFound);
         return entity;
     }
 
-    public async Task<Outcome<IGoodOutcome, IBadOutcome>> RemoveAsync(int id)
+    public async Task<ValueOutcome<IGoodOutcome, IBadOutcome>> RemoveAsync(int id)
     {
         try
         {
@@ -83,6 +83,7 @@ public class BookService : IBookService
             _bookDbContext.Books.Remove(entityToDelete);
             await _bookDbContext.SaveChangesAsync();
 
+            return new ValueOutcome<IGoodOutcome, IBadOutcome>(new GoodOutcome(GoodOutcomeTag.Deleted));
             return new GoodOutcome(GoodOutcomeTag.Deleted);
         }
         catch (Exception e)

@@ -36,6 +36,17 @@ type `TBadOutcome`. For `TGoodOutcome` and `TBadOutcome`, you can use any **non-
 you can use `FooBar`but not `FooBar?` or `Nullable<FooBar>`. This is intentional because nullability can be treated as a
 bad outcome. For convenience, [helper interfaces along with their concrete implementations](#helpers) are provided.
 
+Both types allow constructor creation or implicit conversion. For example, if a method has return
+type `Task<ValueOutcome<IGoodOutcome, IBadOutcome>>`, you can use the following patterns. Implicit return is preferred
+for cleaner code.
+
+```cs
+// use of constructor
+return new ValueOutcome<IGoodOutcome, IBadOutcome>(new GoodOutcome(GoodOutcomeTag.Deleted));
+// return based on implicit conversion
+return new GoodOutcome(GoodOutcomeTag.Deleted);
+```
+
 ---
 
 ### Potential Corner Cases
@@ -47,8 +58,36 @@ bad outcome. For convenience, [helper interfaces along with their concrete imple
 - `TGoodOutcome` and `TBadOutcome` must be of different type. For example, if a method has `Outcome<string, string>`
   as the return type, what's the benefit? In this case, you can just simply use `string` as return type.
 
-- Be careful when you return from method. In the following code, you are returning `int` twice. If you are expecting
-  BadOutcome as `string`, this will never happen because nothing is returned which has `string` as data type.
+- `ValueOutcome` is added for lowering the pressure on the garbage collector. Since C# enforces a parameterless
+  constructor for `struct` type, no one will stop you doing the following:
+
+```csharp
+ValueOutcome<string, int> MisuseOfValueOutcome()
+{
+    return new ValueOutcome<string, int>();
+}
+```
+
+But you will get `InvalidOperationException`at runtime. If you want to enforce it in compile time, simply
+use `Outcome` type which has no parameterless public constructor.
+
+The proper use of `ValueOutcome` should be the following:
+
+```csharp
+ValueOutcome<string, int> ProperUseOfValueOutcome()
+{
+    if (RandomNumberGenerator.GetInt32(1, 10) == 5)
+    {
+        return "Ok";
+    }
+
+    return -1;
+}
+```
+
+- Be careful when you use implicit conversion return feature from method. In the following code, you are returning `int`
+  twice. If you are expecting BadOutcome as `string`, this will never happen because nothing is returned which
+  has `string` as data type.
 
 ```csharp
 
@@ -62,34 +101,6 @@ ValueOutcome<int, string> Gotcha()
     }
 
     return number;
-}
-```
-
-- `ValueOutcome` is added for lowering the pressure on the garbage collector. Since C# enforces a parameterless
-  constructor for `struct` type, no one will stop you doing the following:
-
-```csharp
-ValueOutcome<string, int> MisuseOfValueOutcome()
-{
-    return new ValueOutcome<string, int>();
-}
-```
-
-But you will get `InvalidOperationException`at runtime with the
-message `"Invoking Parameterless constructor is not allowed."`. If you want to enforce it in compile time, simply
-use `Outcome` type which has no public constructor.
-
-The proper use of `ValueOutcome` should be the following:
-
-```csharp
-ValueOutcome<string, int> ProperUseOfValueOutcome()
-{
-    if (RandomNumberGenerator.GetInt32(1, 10) == 5)
-    {
-        return "Ok";
-    }
-
-    return -1;
 }
 ```
 

@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
         <Version>0.0.7</Version>
         <Title>SharpOutcome</Title>
         <Authors>Md. Redwan Hossain</Authors>
