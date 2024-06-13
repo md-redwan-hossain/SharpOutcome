@@ -4,7 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-        <Version>0.0.8</Version>
+        <Version>0.0.9</Version>
         <Title>SharpOutcome</Title>
         <Authors>Md. Redwan Hossain</Authors>
         <Copyright>Copyright (c) Md. Redwan Hossain</Copyright>
@@ -34,11 +34,6 @@
             <Link>README.md</Link>
             <PackagePath>.</PackagePath>
         </None>
-    </ItemGroup>
-
-
-    <ItemGroup>
-      <Folder Include="Helpers\" />
     </ItemGroup>
     
 

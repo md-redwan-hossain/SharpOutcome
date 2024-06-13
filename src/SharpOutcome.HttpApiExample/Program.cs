@@ -32,7 +32,6 @@ builder.Services.TryAddSingleton<IClientErrorFactory, ClientErrorFactory>();
 
 builder.Services.AddDbContext<BookDbContext>(opts => opts.UseSqlite(connectionString));
 
-
 builder.Services.AddControllers(opts =>
     {
         opts.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));

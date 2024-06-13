@@ -11,11 +11,7 @@ namespace SharpOutcome.HttpApiExample.Controllers;
 public sealed class BookController : ControllerBase
 {
     private readonly IBookService _bookService;
-
-    public BookController(IBookService bookService)
-    {
-        _bookService = bookService;
-    }
+    public BookController(IBookService bookService) => _bookService = bookService;
 
     [HttpGet]
     public async Task<IActionResult> GetBook()
@@ -29,7 +25,7 @@ public sealed class BookController : ControllerBase
     {
         var result = await _bookService.GetOneAsync(id);
 
-        return result.Match<IActionResult>(
+        return result.Match(
             entity => ControllerContext.MakeResponse(StatusCodes.Status200OK, entity),
             err => ControllerContext.MakeResponse(err)
         );
