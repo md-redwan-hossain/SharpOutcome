@@ -1,3 +1,7 @@
+| Branch | Status                                                                                                            |
+|--------|-------------------------------------------------------------------------------------------------------------------|
+| main   | ![Dotnet 8](https://github.com/md-redwan-hossain/SharpOutcome/actions/workflows/dotnet.yml/badge.svg?branch=main) |
+
 - [Installation](#installation)
 - [Introduction](#introduction)
 - [Potential Corner Cases](#potential-corner-cases)
