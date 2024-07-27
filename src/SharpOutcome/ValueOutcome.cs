@@ -133,7 +133,7 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
     /// Tries to pick the good outcome from the <see cref="ValueOutcome{TGoodOutcome, TBadOutcome}"/>.
     /// </summary>
     /// <param name="goodOutcome">When this method returns, contains the good outcome if it exists; otherwise, the default value.</param>
-    /// <param name="badOutcome">When this method returns, contains the bad outcome if the good outcome does not exists; otherwise, the default value.</param>
+    /// <param name="badOutcome">When this method returns, contains the bad outcome if the good outcome does not exist; otherwise, the default value.</param>
     /// <returns><c>true</c> if the good outcome exists; otherwise, <c>false</c>.</returns>
     public bool TryPickGoodOutcome([NotNullWhen(true)] out TGoodOutcome? goodOutcome,
         [NotNullWhen(false)] out TBadOutcome? badOutcome)
@@ -156,7 +156,7 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
     /// Tries to pick the bad outcome from the <see cref="ValueOutcome{TGoodOutcome, TBadOutcome}"/>.
     /// </summary>
     /// <param name="badOutcome">When this method returns, contains the bad outcome if it exists; otherwise, the default value.</param>
-    /// <param name="goodOutcome">When this method returns, contains the good outcome if the bad outcome does not exists; otherwise, the default value.</param>
+    /// <param name="goodOutcome">When this method returns, contains the good outcome if the bad outcome does not exist; otherwise, the default value.</param>
     /// <returns><c>true</c> if the bad outcome exists; otherwise, <c>false</c>.</returns>
     public bool TryPickBadOutcome([NotNullWhen(true)] out TBadOutcome? badOutcome,
         [NotNullWhen(false)] out TGoodOutcome? goodOutcome)

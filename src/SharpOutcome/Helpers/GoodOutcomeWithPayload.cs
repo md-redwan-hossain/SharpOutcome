@@ -7,7 +7,7 @@ namespace SharpOutcome.Helpers;
 /// <typeparam name="TPayload">The type of the payload.</typeparam>
 /// <param name="Payload">The payload that carries contextual data.</param>
 /// <param name="Reason">The reason for the good outcome (optional).</param>
-public record GoodOutcomeWithPayload<TPayload>(
+public readonly record struct GoodOutcomeWithPayload<TPayload>(
     GoodOutcomeTag Tag,
     TPayload Payload,
     string? Reason = null
@@ -21,7 +21,7 @@ public record GoodOutcomeWithPayload<TPayload>(
 /// <typeparam name="TPayload">The type of the payload.</typeparam>
 /// <param name="Payload">The payload that carries contextual data.</param>
 /// <param name="Reason">The reason for the good outcome (optional).</param>
-public record GoodOutcomeWithPayload<TPayload, TOutcomeTag>(
+public readonly record struct GoodOutcomeWithPayload<TPayload, TOutcomeTag>(
     TOutcomeTag Tag,
     TPayload Payload,
     string? Reason = null
