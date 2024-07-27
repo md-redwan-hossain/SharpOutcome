@@ -4,7 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-        <Version>0.0.9</Version>
+        <Version>0.0.10</Version>
         <Title>SharpOutcome</Title>
         <Authors>Md. Redwan Hossain</Authors>
         <Copyright>Copyright (c) Md. Redwan Hossain</Copyright>
