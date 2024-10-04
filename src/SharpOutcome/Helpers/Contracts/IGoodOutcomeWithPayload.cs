@@ -1,4 +1,6 @@
-namespace SharpOutcome.Helpers;
+using SharpOutcome.Helpers.Enums;
+
+namespace SharpOutcome.Helpers.Contracts;
 
 /// <summary>
 /// Enforces a contract for good outcome with payload of type <typeparamref name="TPayload"/>.

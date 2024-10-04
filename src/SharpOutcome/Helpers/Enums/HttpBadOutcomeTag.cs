@@ -1,4 +1,4 @@
-namespace SharpOutcome.Helpers;
+namespace SharpOutcome.Helpers.Enums;
 
 /// <summary>
 /// Represents the types of HTTP bad outcomes.

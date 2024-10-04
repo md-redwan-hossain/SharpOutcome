@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using SharpOutcome.Helpers;
+using SharpOutcome.Helpers.Contracts;
+using SharpOutcome.Helpers.Enums;
 using SharpOutcome.HttpApiExample.Utils;
 
 namespace SharpOutcome.HttpApiExample.Controllers;

@@ -1,3 +1,6 @@
+using SharpOutcome.Helpers.Contracts;
+using SharpOutcome.Helpers.Enums;
+
 namespace SharpOutcome.Helpers;
 
 /// <summary>
