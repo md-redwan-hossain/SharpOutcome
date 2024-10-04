@@ -26,7 +26,7 @@ public interface IBadOutcomeWithPayload<out TPayload>
 /// <summary>
 /// Enforces a contract for bad outcome with payload of type <typeparamref name="TPayload"/>.
 /// </summary>
-public interface IBadOutcomeWithPayload<out TPayload, out TOutcomeTag>
+public interface IBadOutcomeWithPayload< out TOutcomeTag,out TPayload>
 {
     /// <summary>
     /// Gets the unique tag of the bad outcome.

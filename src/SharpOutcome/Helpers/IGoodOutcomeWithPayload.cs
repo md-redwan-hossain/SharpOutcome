@@ -22,11 +22,10 @@ public interface IGoodOutcomeWithPayload<out TPayload>
     string? Reason { get; }
 }
 
-
 /// <summary>
 /// Enforces a contract for good outcome with payload of type <typeparamref name="TPayload"/>.
 /// </summary>
-public interface IGoodOutcomeWithPayload<out TPayload, out TOutcomeTag>
+public interface IGoodOutcomeWithPayload<out TOutcomeTag, out TPayload>
 {
     /// <summary>
     /// Gets the unique tag of the good outcome.

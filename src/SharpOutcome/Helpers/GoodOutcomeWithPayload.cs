@@ -21,8 +21,8 @@ public readonly record struct GoodOutcomeWithPayload<TPayload>(
 /// <typeparam name="TPayload">The type of the payload.</typeparam>
 /// <param name="Payload">The payload that carries contextual data.</param>
 /// <param name="Reason">The reason for the good outcome (optional).</param>
-public readonly record struct GoodOutcomeWithPayload<TPayload, TOutcomeTag>(
+public readonly record struct GoodOutcomeWithPayload<TOutcomeTag, TPayload>(
     TOutcomeTag Tag,
     TPayload Payload,
     string? Reason = null
-) : IGoodOutcomeWithPayload<TPayload, TOutcomeTag>;
+) : IGoodOutcomeWithPayload<TOutcomeTag, TPayload>;
