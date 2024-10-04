@@ -8,7 +8,7 @@ namespace SharpOutcome.Helpers;
 /// </summary>
 /// <param name="Tag">The unique tag of the good outcome.</param>
 /// <param name="Reason">The reason for the good outcome (optional).</param>
-public readonly record struct HttpGoodOutcome(HttpGoodOutcomeTag Tag, string? Reason)
+public readonly record struct HttpGoodOutcome(HttpGoodOutcomeTag Tag, string? Reason = null)
     : IGoodOutcome<HttpGoodOutcomeTag>;
 
 /// <summary>
@@ -18,5 +18,5 @@ public readonly record struct HttpGoodOutcome(HttpGoodOutcomeTag Tag, string? Re
 /// <typeparam name="TPayload">The type of the payload.</typeparam>
 /// <param name="Payload">The payload that carries contextual data.</param>
 /// <param name="Reason">The reason for the good outcome (optional).</param>
-public readonly record struct HttpGoodOutcome<TPayload>(HttpGoodOutcomeTag Tag, TPayload Payload, string? Reason)
+public readonly record struct HttpGoodOutcome<TPayload>(HttpGoodOutcomeTag Tag, TPayload Payload, string? Reason = null)
     : IGoodOutcomeWithPayload<HttpGoodOutcomeTag, TPayload>;
