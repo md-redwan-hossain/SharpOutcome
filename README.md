@@ -11,9 +11,11 @@
     - [`Switch` and `SwitchAsync`](#switch-and-switchasync)
     - [`IsGoodOutcome` and `IsBadOutcome`](#isgoodoutcome-and-isbadoutcome)
     - [`TryPickGoodOutcome(out TGoodOutcome? goodOutcome)`](#trypickgoodoutcomeout-tgoodoutcome-goodoutcome)
-    - [`TryPickGoodOutcome(out TGoodOutcome? goodOutcome, out TBadOutcome? badOutcome)`](#trypickgoodoutcomeout-tgoodoutcome-goodoutcome-out-tbadoutcome-badoutcome)
+    - [
+      `TryPickGoodOutcome(out TGoodOutcome? goodOutcome, out TBadOutcome? badOutcome)`](#trypickgoodoutcomeout-tgoodoutcome-goodoutcome-out-tbadoutcome-badoutcome)
     - [`TryPickBadOutcome(out TBadOutcome? badOutcome)`](#trypickbadoutcomeout-tbadoutcome-badoutcome)
-    - [`TryPickBadOutcome(out TGoodOutcome? goodOutcome, out TBadOutcome? badOutcome)`](#trypickbadoutcomeout-tgoodoutcome-goodoutcome-out-tbadoutcome-badoutcome)
+    - [
+      `TryPickBadOutcome(out TGoodOutcome? goodOutcome, out TBadOutcome? badOutcome)`](#trypickbadoutcomeout-tgoodoutcome-goodoutcome-out-tbadoutcome-badoutcome)
 - [Helpers](#helpers)
 - [Example Code Snippets](#example-code-snippets)
 
@@ -58,6 +60,8 @@ return new GoodOutcome(GoodOutcomeTag.Deleted);
 - Since `TGoodOutcome` and `TBadOutcome` can take any **non-nullable type**, it is your responsibility to use them
   properly. No one will stop you from flipping the semantics. For example, you can use any **non-nullable type**
   for `TBadOutcome` that is meant for something good or success, but you shouldn't.
+
+- If you need to use nullable type, wrap it with `NullablePrimitive` or `NullableNonPrimitive` as per your need.
 
 - `TGoodOutcome` and `TBadOutcome` must be of different type. For example, if a method has `Outcome<string, string>`
   as the return type, what's the benefit? In this case, you can just simply use `string` as return type.

@@ -1,4 +1,3 @@
-using SharpOutcome.Helpers;
 using SharpOutcome.Helpers.Contracts;
 using SharpOutcome.HttpApiExample.Data;
 using SharpOutcome.HttpApiExample.DataTransferObjects;

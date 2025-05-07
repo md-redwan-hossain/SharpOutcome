@@ -3,8 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace SharpOutcome.HttpApiExample.Data;
 
-public class BookDbContext(DbContextOptions<BookDbContext> options)
-    : DbContext(options)
+public class BookDbContext(DbContextOptions<BookDbContext> options) : DbContext(options)
 {
     public DbSet<Book> Books => Set<Book>();
 

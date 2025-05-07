@@ -42,7 +42,7 @@ public class BookService : IBookService
     {
         try
         {
-            var entityToUpdate = await _bookDbContext.Books.FindAsync(id);
+            var entityToUpdate = await _bookDbContext.Books.FirstOrDefaultAsync(x=>x.Id == id);
             if (entityToUpdate is null) return new BadOutcome(BadOutcomeTag.NotFound);
 
             await dto.BuildAdapter().AdaptToAsync(entityToUpdate);
