@@ -1,4 +1,4 @@
-using FluentAssertions;
+using Shouldly;
 
 namespace SharpOutcome.Tests;
 
@@ -13,8 +13,8 @@ public class OutcomeTests
         var outcome = new Outcome<string, int>("success");
 
         // Assert
-        outcome.IsGoodOutcome().Should().BeTrue();
-        outcome.IsBadOutcome().Should().BeFalse();
+        outcome.IsGoodOutcome().ShouldBeTrue();
+        outcome.IsBadOutcome().ShouldBeFalse();
     }
 
     [Fact]
@@ -24,8 +24,8 @@ public class OutcomeTests
         var outcome = new Outcome<string, int>(404);
 
         // Assert
-        outcome.IsGoodOutcome().Should().BeFalse();
-        outcome.IsBadOutcome().Should().BeTrue();
+        outcome.IsGoodOutcome().ShouldBeFalse();
+        outcome.IsBadOutcome().ShouldBeTrue();
     }
 
     #endregion
@@ -39,8 +39,8 @@ public class OutcomeTests
         Outcome<string, int> outcome = "success";
 
         // Assert
-        outcome.IsGoodOutcome().Should().BeTrue();
-        outcome.IsBadOutcome().Should().BeFalse();
+        outcome.IsGoodOutcome().ShouldBeTrue();
+        outcome.IsBadOutcome().ShouldBeFalse();
     }
 
     [Fact]
@@ -50,8 +50,8 @@ public class OutcomeTests
         Outcome<string, int> outcome = 404;
 
         // Assert
-        outcome.IsGoodOutcome().Should().BeFalse();
-        outcome.IsBadOutcome().Should().BeTrue();
+        outcome.IsGoodOutcome().ShouldBeFalse();
+        outcome.IsBadOutcome().ShouldBeTrue();
     }
 
     #endregion
@@ -65,7 +65,7 @@ public class OutcomeTests
         var outcome = new Outcome<string, int>("success");
 
         // Act & Assert
-        outcome.IsGoodOutcome().Should().BeTrue();
+        outcome.IsGoodOutcome().ShouldBeTrue();
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class OutcomeTests
         var outcome = new Outcome<string, int>(404);
 
         // Act & Assert
-        outcome.IsGoodOutcome().Should().BeFalse();
+        outcome.IsGoodOutcome().ShouldBeFalse();
     }
 
     #endregion
@@ -89,7 +89,7 @@ public class OutcomeTests
         var outcome = new Outcome<string, int>(404);
 
         // Act & Assert
-        outcome.IsBadOutcome().Should().BeTrue();
+        outcome.IsBadOutcome().ShouldBeTrue();
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public class OutcomeTests
         var outcome = new Outcome<string, int>("success");
 
         // Act & Assert
-        outcome.IsBadOutcome().Should().BeFalse();
+        outcome.IsBadOutcome().ShouldBeFalse();
     }
 
     #endregion
@@ -116,8 +116,8 @@ public class OutcomeTests
         var result = outcome.TryPickGoodOutcome(out var goodOutcome);
 
         // Assert
-        result.Should().BeTrue();
-        goodOutcome.Should().Be("success");
+        result.ShouldBeTrue();
+        goodOutcome.ShouldBe("success");
     }
 
     [Fact]
@@ -130,8 +130,8 @@ public class OutcomeTests
         var result = outcome.TryPickGoodOutcome(out var goodOutcome);
 
         // Assert
-        result.Should().BeFalse();
-        goodOutcome.Should().BeNull();
+        result.ShouldBeFalse();
+        goodOutcome.ShouldBeNull();
     }
 
     [Fact]
@@ -144,9 +144,9 @@ public class OutcomeTests
         var result = outcome.TryPickGoodOutcome(out var goodOutcome, out var badOutcome);
 
         // Assert
-        result.Should().BeTrue();
-        goodOutcome.Should().Be("success");
-        badOutcome.Should().Be(0);
+        result.ShouldBeTrue();
+        goodOutcome.ShouldBe("success");
+        badOutcome.ShouldBe(0);
     }
 
     [Fact]
@@ -159,9 +159,9 @@ public class OutcomeTests
         var result = outcome.TryPickGoodOutcome(out var goodOutcome, out var badOutcome);
 
         // Assert
-        result.Should().BeFalse();
-        goodOutcome.Should().BeNull();
-        badOutcome.Should().Be(404);
+        result.ShouldBeFalse();
+        goodOutcome.ShouldBeNull();
+        badOutcome.ShouldBe(404);
     }
 
     #endregion
@@ -178,8 +178,8 @@ public class OutcomeTests
         var result = outcome.TryPickBadOutcome(out var badOutcome);
 
         // Assert
-        result.Should().BeTrue();
-        badOutcome.Should().Be(404);
+        result.ShouldBeTrue();
+        badOutcome.ShouldBe(404);
     }
 
     [Fact]
@@ -192,8 +192,8 @@ public class OutcomeTests
         var result = outcome.TryPickBadOutcome(out var badOutcome);
 
         // Assert
-        result.Should().BeFalse();
-        badOutcome.Should().Be(0);
+        result.ShouldBeFalse();
+        badOutcome.ShouldBe(0);
     }
 
     [Fact]
@@ -206,9 +206,9 @@ public class OutcomeTests
         var result = outcome.TryPickBadOutcome(out var badOutcome, out var goodOutcome);
 
         // Assert
-        result.Should().BeTrue();
-        badOutcome.Should().Be(404);
-        goodOutcome.Should().BeNull();
+        result.ShouldBeTrue();
+        badOutcome.ShouldBe(404);
+        goodOutcome.ShouldBeNull();
     }
 
     [Fact]
@@ -221,9 +221,9 @@ public class OutcomeTests
         var result = outcome.TryPickBadOutcome(out var badOutcome, out var goodOutcome);
 
         // Assert
-        result.Should().BeFalse();
-        badOutcome.Should().Be(0);
-        goodOutcome.Should().Be("success");
+        result.ShouldBeFalse();
+        badOutcome.ShouldBe(0);
+        goodOutcome.ShouldBe("success");
     }
 
     #endregion
@@ -243,7 +243,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Good: success");
+        result.ShouldBe("Good: success");
     }
 
     [Fact]
@@ -259,7 +259,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Bad: 404");
+        result.ShouldBe("Bad: 404");
     }
 
     [Fact]
@@ -275,7 +275,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be(84);
+        result.ShouldBe(84);
     }
 
     #endregion
@@ -295,7 +295,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Good: success");
+        result.ShouldBe("Good: success");
     }
 
     [Fact]
@@ -311,7 +311,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Bad: 404");
+        result.ShouldBe("Bad: 404");
     }
 
     [Fact]
@@ -327,7 +327,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Good: success");
+        result.ShouldBe("Good: success");
     }
 
     [Fact]
@@ -343,7 +343,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Bad: 404");
+        result.ShouldBe("Bad: 404");
     }
 
     [Fact]
@@ -359,7 +359,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Good: success");
+        result.ShouldBe("Good: success");
     }
 
     [Fact]
@@ -375,7 +375,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Bad: 404");
+        result.ShouldBe("Bad: 404");
     }
 
     #endregion
@@ -396,7 +396,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Good: success");
+        result.ShouldBe("Good: success");
     }
 
     [Fact]
@@ -413,7 +413,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Bad: 404");
+        result.ShouldBe("Bad: 404");
     }
 
     #endregion
@@ -442,7 +442,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Good: success");
+        result.ShouldBe("Good: success");
     }
 
     [Fact]
@@ -467,7 +467,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Bad: 404");
+        result.ShouldBe("Bad: 404");
     }
 
     [Fact]
@@ -488,7 +488,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Good: success");
+        result.ShouldBe("Good: success");
     }
 
     [Fact]
@@ -509,7 +509,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Bad: 404");
+        result.ShouldBe("Bad: 404");
     }
 
     [Fact]
@@ -530,7 +530,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Good: success");
+        result.ShouldBe("Good: success");
     }
 
     [Fact]
@@ -551,7 +551,7 @@ public class OutcomeTests
         );
 
         // Assert
-        result.Should().Be("Bad: 404");
+        result.ShouldBe("Bad: 404");
     }
 
     #endregion
@@ -569,8 +569,8 @@ public class OutcomeTests
         var result = outcome.TryPickGoodOutcome(out var data);
 
         // Assert
-        result.Should().BeTrue();
-        data.Should().BeEquivalentTo(goodData);
+        result.ShouldBeTrue();
+        data.ShouldBeEquivalentTo(goodData);
     }
 
     [Fact]
@@ -584,9 +584,9 @@ public class OutcomeTests
         var result = outcome.TryPickBadOutcome(out var error);
 
         // Assert
-        result.Should().BeTrue();
-        error.Should().Be(exception);
-        error?.Message.Should().Be("Test error");
+        result.ShouldBeTrue();
+        error.ShouldBe(exception);
+        error?.Message.ShouldBe("Test error");
     }
 
     #endregion
@@ -612,9 +612,9 @@ public class OutcomeTests
         var finalOutcome = new Outcome<int, string>(intermediateResult);
 
         // Assert
-        finalOutcome.IsGoodOutcome().Should().BeTrue();
+        finalOutcome.IsGoodOutcome().ShouldBeTrue();
         finalOutcome.TryPickGoodOutcome(out var value);
-        value.Should().Be(84);
+        value.ShouldBe(84);
     }
 
     #endregion

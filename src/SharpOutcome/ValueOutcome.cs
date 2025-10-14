@@ -19,8 +19,8 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
     private readonly bool _isGoodOutcome;
     private readonly bool _isBadOutcome;
 
-    private const string InvalidStateErrorMsg =
-        "IsGoodOutcome and IsBadOutcome can't be false at the same time.";
+    private const string InvalidStateErrorMsg
+        = "IsGoodOutcome and IsBadOutcome can't be false at the same time.";
 
 
     public ValueOutcome()
