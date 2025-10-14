@@ -34,7 +34,7 @@ public sealed class BookController : ControllerBase
     [HttpPut("{id:int}")]
     public async Task<IActionResult> PutBook(int id, BookRequest dto)
     {
-        if (ModelState.IsValid is false)
+        if (!ModelState.IsValid)
         {
             return ControllerContext.MakeResponse(StatusCodes.Status400BadRequest);
         }
@@ -50,7 +50,7 @@ public sealed class BookController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> PostBook(BookRequest dto)
     {
-        if (ModelState.IsValid is false)
+        if (!ModelState.IsValid)
         {
             return ControllerContext.MakeResponse(StatusCodes.Status400BadRequest);
         }

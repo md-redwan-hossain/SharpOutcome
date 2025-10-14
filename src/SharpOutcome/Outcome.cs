@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
@@ -92,8 +91,9 @@ public class Outcome<TGoodOutcome, TBadOutcome>
     {
         CheckInvalidState();
 
-        if (_isBadOutcome is false && _goodOutcome is not null)
+        if (!_isBadOutcome)
         {
+            ArgumentNullException.ThrowIfNull(_goodOutcome);
             goodOutcome = _goodOutcome;
             return true;
         }
@@ -111,8 +111,9 @@ public class Outcome<TGoodOutcome, TBadOutcome>
     {
         CheckInvalidState();
 
-        if (_isBadOutcome && _badOutcome is not null)
+        if (_isBadOutcome)
         {
+            ArgumentNullException.ThrowIfNull(_badOutcome);
             badOutcome = _badOutcome;
             return true;
         }
@@ -132,16 +133,18 @@ public class Outcome<TGoodOutcome, TBadOutcome>
     {
         CheckInvalidState();
 
-        if (_isBadOutcome is false && _goodOutcome is not null)
+        if (_isGoodOutcome)
         {
+            ArgumentNullException.ThrowIfNull(_goodOutcome);
             goodOutcome = _goodOutcome;
             badOutcome = default;
-            return _goodOutcome is not null;
+            return true;
         }
 
+        ArgumentNullException.ThrowIfNull(_badOutcome);
         badOutcome = _badOutcome;
         goodOutcome = default;
-        return EqualityComparer<TBadOutcome>.Default.Equals(_badOutcome, default);
+        return false;
     }
 
     /// <summary>
@@ -155,16 +158,18 @@ public class Outcome<TGoodOutcome, TBadOutcome>
     {
         CheckInvalidState();
 
-        if (_isBadOutcome && _badOutcome is not null)
+        if (_isBadOutcome)
         {
+            ArgumentNullException.ThrowIfNull(_badOutcome);
             badOutcome = _badOutcome;
             goodOutcome = default;
-            return _badOutcome is not null;
+            return true;
         }
 
+        ArgumentNullException.ThrowIfNull(_goodOutcome);
         goodOutcome = _goodOutcome;
         badOutcome = default;
-        return EqualityComparer<TGoodOutcome>.Default.Equals(_goodOutcome, default);
+        return false;
     }
 
     /// <summary>
@@ -348,7 +353,7 @@ public class Outcome<TGoodOutcome, TBadOutcome>
 
     private void CheckInvalidState()
     {
-        if (_isGoodOutcome is false && _isBadOutcome is false)
+        if (!_isGoodOutcome && !_isBadOutcome)
         {
             throw new InvalidOperationException(InvalidStateErrorMsg);
         }
