@@ -5,96 +5,79 @@ using System.Threading.Tasks;
 namespace SharpOutcome;
 
 /// <summary>
-/// Represents an outcome that can either be a good outcome of type <typeparamref name="TGoodOutcome"/> or a bad outcome of type <typeparamref name="TBadOutcome"/>.
+/// Represents an outcome that can either be a good outcome of type <typeparamref name="TGoodOutcome"/> 
+/// or a bad outcome of type <typeparamref name="TBadOutcome"/>.
 /// </summary>
 /// <typeparam name="TGoodOutcome">The type of the good outcome.</typeparam>
 /// <typeparam name="TBadOutcome">The type of the bad outcome.</typeparam>
 public class Outcome<TGoodOutcome, TBadOutcome>
     where TGoodOutcome : notnull
     where TBadOutcome : notnull
-
 {
+    private const byte StateUninitialized = 0;
+    private const byte StateGood = 1;
+    private const byte StateBad = 2;
+
     private readonly TGoodOutcome? _goodOutcome;
     private readonly TBadOutcome? _badOutcome;
-    private readonly bool _isGoodOutcome;
-    private readonly bool _isBadOutcome;
-
-    private const string InvalidStateErrorMsg =
-        "IsGoodOutcome and IsBadOutcome can't be false at the same time.";
-
+    private readonly byte _state;
 
     public Outcome(TGoodOutcome goodOutcome)
     {
         ArgumentNullException.ThrowIfNull(goodOutcome);
-        _isGoodOutcome = true;
-        _isBadOutcome = false;
         _goodOutcome = goodOutcome;
         _badOutcome = default;
+        _state = StateGood;
     }
 
     public Outcome(TBadOutcome badOutcome)
     {
         ArgumentNullException.ThrowIfNull(badOutcome);
-        _isGoodOutcome = false;
-        _isBadOutcome = true;
         _badOutcome = badOutcome;
         _goodOutcome = default;
+        _state = StateBad;
     }
 
     /// <summary>
-    /// Implicitly converts a value of type <typeparamref name="TGoodOutcome"/> to an <see cref="Outcome{TGoodOutcome, TBadOutcome}"/> with a good outcome.
+    /// Gets a value indicating whether the outcome is a good outcome.
     /// </summary>
-    /// <param name="goodOutcome">The value of type <typeparamref name="TGoodOutcome"/> to convert.</param>
-    /// <returns>A <see cref="Outcome{TGoodOutcome, TBadOutcome}"/> with a good outcome.</returns>
-    public static implicit operator Outcome<TGoodOutcome, TBadOutcome>(TGoodOutcome goodOutcome)
+    public bool IsGoodOutcome
     {
-        return new Outcome<TGoodOutcome, TBadOutcome>(goodOutcome);
+        get
+        {
+            AssertInitialized();
+            return _state == StateGood;
+        }
     }
 
     /// <summary>
-    /// Implicitly converts a value of type <typeparamref name="TBadOutcome"/> to an <see cref="Outcome{TGoodOutcome, TBadOutcome}"/> with a bad outcome.
+    /// Gets a value indicating whether the outcome is a bad outcome.
     /// </summary>
-    /// <param name="badOutcome">The value of type <typeparamref name="TBadOutcome"/> to convert.</param>
-    /// <returns>A <see cref="Outcome{TGoodOutcome, TBadOutcome}"/> with a bad outcome.</returns>
-    public static implicit operator Outcome<TGoodOutcome, TBadOutcome>(TBadOutcome badOutcome)
+    public bool IsBadOutcome
     {
-        return new Outcome<TGoodOutcome, TBadOutcome>(badOutcome);
+        get
+        {
+            AssertInitialized();
+            return _state == StateBad;
+        }
     }
 
+    public static implicit operator Outcome<TGoodOutcome, TBadOutcome>(TGoodOutcome goodOutcome) =>
+        new(goodOutcome);
+
+    public static implicit operator Outcome<TGoodOutcome, TBadOutcome>(TBadOutcome badOutcome) =>
+        new(badOutcome);
 
     /// <summary>
-    /// Gets a boolean value indicating whether the outcome is a good outcome.
+    /// Tries to pick the good outcome.
     /// </summary>
-    public bool IsGoodOutcome()
-    {
-        CheckInvalidState();
-        return _isGoodOutcome;
-    }
-
-
-    /// <summary>
-    /// Gets a boolean value indicating whether the outcome is a bad outcome.
-    /// </summary>
-    public bool IsBadOutcome()
-    {
-        CheckInvalidState();
-        return _isBadOutcome;
-    }
-
-
-    /// <summary>
-    /// Tries to pick the good outcome from the <see cref="Outcome{TGoodOutcome, TBadOutcome}"/>.
-    /// </summary>
-    /// <param name="goodOutcome">When this method returns, contains the good outcome if it exists; otherwise, the default value.</param>
-    /// <returns><c>true</c> if the good outcome exists; otherwise, <c>false</c>.</returns>
     public bool TryPickGoodOutcome([NotNullWhen(true)] out TGoodOutcome? goodOutcome)
     {
-        CheckInvalidState();
+        AssertInitialized();
 
-        if (!_isBadOutcome)
+        if (_state == StateGood)
         {
-            ArgumentNullException.ThrowIfNull(_goodOutcome);
-            goodOutcome = _goodOutcome;
+            goodOutcome = GetGoodOutcome();
             return true;
         }
 
@@ -103,18 +86,15 @@ public class Outcome<TGoodOutcome, TBadOutcome>
     }
 
     /// <summary>
-    /// Tries to pick the bad outcome from the <see cref="Outcome{TGoodOutcome, TBadOutcome}"/>.
+    /// Tries to pick the bad outcome.
     /// </summary>
-    /// <param name="badOutcome">When this method returns, contains the bad outcome if it exists; otherwise, the default value.</param>
-    /// <returns><c>true</c> if the bad outcome exists; otherwise, <c>false</c>.</returns>
     public bool TryPickBadOutcome([NotNullWhen(true)] out TBadOutcome? badOutcome)
     {
-        CheckInvalidState();
+        AssertInitialized();
 
-        if (_isBadOutcome)
+        if (_state == StateBad)
         {
-            ArgumentNullException.ThrowIfNull(_badOutcome);
-            badOutcome = _badOutcome;
+            badOutcome = GetBadOutcome();
             return true;
         }
 
@@ -123,239 +103,224 @@ public class Outcome<TGoodOutcome, TBadOutcome>
     }
 
     /// <summary>
-    /// Tries to pick the good outcome from the <see cref="Outcome{TGoodOutcome, TBadOutcome}"/>.
+    /// Tries to pick the good outcome; if unsuccessful, outputs the bad outcome.
     /// </summary>
-    /// <param name="goodOutcome">When this method returns, contains the good outcome if it exists; otherwise, the default value.</param>
-    /// <param name="badOutcome">When this method returns, contains the bad outcome if the good outcome does not exists; otherwise, the default value.</param>
-    /// <returns><c>true</c> if the good outcome exists; otherwise, <c>false</c>.</returns>
-    public bool TryPickGoodOutcome([NotNullWhen(true)] out TGoodOutcome? goodOutcome,
+    public bool TryPickGoodOutcome(
+        [NotNullWhen(true)] out TGoodOutcome? goodOutcome,
         [NotNullWhen(false)] out TBadOutcome? badOutcome)
     {
-        CheckInvalidState();
+        AssertInitialized();
 
-        if (_isGoodOutcome)
+        if (_state == StateGood)
         {
-            ArgumentNullException.ThrowIfNull(_goodOutcome);
-            goodOutcome = _goodOutcome;
+            goodOutcome = GetGoodOutcome();
             badOutcome = default;
             return true;
         }
 
-        ArgumentNullException.ThrowIfNull(_badOutcome);
-        badOutcome = _badOutcome;
         goodOutcome = default;
+        badOutcome = GetBadOutcome();
         return false;
     }
 
     /// <summary>
-    /// Tries to pick the bad outcome from the <see cref="Outcome{TGoodOutcome, TBadOutcome}"/>.
+    /// Tries to pick the bad outcome; if unsuccessful, outputs the good outcome.
     /// </summary>
-    /// <param name="badOutcome">When this method returns, contains the bad outcome if it exists; otherwise, the default value.</param>
-    /// <param name="goodOutcome">When this method returns, contains the good outcome if the bad outcome does not exists; otherwise, the default value.</param>
-    /// <returns><c>true</c> if the bad outcome exists; otherwise, <c>false</c>.</returns>
-    public bool TryPickBadOutcome([NotNullWhen(true)] out TBadOutcome? badOutcome,
+    public bool TryPickBadOutcome(
+        [NotNullWhen(true)] out TBadOutcome? badOutcome,
         [NotNullWhen(false)] out TGoodOutcome? goodOutcome)
     {
-        CheckInvalidState();
+        AssertInitialized();
 
-        if (_isBadOutcome)
+        if (_state == StateBad)
         {
-            ArgumentNullException.ThrowIfNull(_badOutcome);
-            badOutcome = _badOutcome;
+            badOutcome = GetBadOutcome();
             goodOutcome = default;
             return true;
         }
 
-        ArgumentNullException.ThrowIfNull(_goodOutcome);
-        goodOutcome = _goodOutcome;
         badOutcome = default;
+        goodOutcome = GetGoodOutcome();
         return false;
     }
 
     /// <summary>
-    /// Matches the outcome and executes the appropriate delegate based on whether the outcome is good or bad.
+    /// Deconstructs the outcome into its status and values.
     /// </summary>
-    /// <typeparam name="TOutput">The type of the output.</typeparam>
-    /// <param name="onGoodOutcome">The delegate to execute if the outcome is good.</param>
-    /// <param name="onBadOutcome">The delegate to execute if the outcome is bad.</param>
-    /// <returns>The result of executing the appropriate delegate.</returns>
-    public TOutput Match<TOutput>(Func<TGoodOutcome, TOutput> onGoodOutcome,
+    public void Deconstruct(
+        out bool isGood,
+        out TGoodOutcome? goodOutcome,
+        out TBadOutcome? badOutcome)
+    {
+        AssertInitialized();
+        isGood = _state == StateGood;
+        goodOutcome = _goodOutcome;
+        badOutcome = _badOutcome;
+    }
+
+    public TOutput Match<TOutput>(
+        Func<TGoodOutcome, TOutput> onGoodOutcome,
         Func<TBadOutcome, TOutput> onBadOutcome)
     {
-        if (_isBadOutcome)
-        {
-            return onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
-        }
+        ArgumentNullException.ThrowIfNull(onGoodOutcome);
+        ArgumentNullException.ThrowIfNull(onBadOutcome);
+        AssertInitialized();
 
-        if (_isGoodOutcome)
-        {
-            return onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
-        }
-
-        throw new InvalidOperationException(InvalidStateErrorMsg);
+        return _state == StateGood
+            ? onGoodOutcome(GetGoodOutcome())
+            : onBadOutcome(GetBadOutcome());
     }
 
-
-    /// <summary>
-    /// Matches the outcome and asynchronously executes the appropriate delegate based on whether the outcome is good or bad.
-    /// </summary>
-    /// <typeparam name="TOutput">The type of the output.</typeparam>
-    /// <param name="onGoodOutcome">The asynchronous delegate to execute if the outcome is good.</param>
-    /// <param name="onBadOutcome">The asynchronous delegate to execute if the outcome is bad.</param>
-    /// <returns>A task that represents the asynchronous operation and contains the result of executing the appropriate delegate.</returns>
-    public async Task<TOutput> MatchAsync<TOutput>(Func<TGoodOutcome, Task<TOutput>> onGoodOutcome,
+    public async Task<TOutput> MatchAsync<TOutput>(
+        Func<TGoodOutcome, Task<TOutput>> onGoodOutcome,
         Func<TBadOutcome, Task<TOutput>> onBadOutcome)
     {
-        if (_isBadOutcome)
-        {
-            return await onBadOutcome(_badOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false);
-        }
+        ArgumentNullException.ThrowIfNull(onGoodOutcome);
+        ArgumentNullException.ThrowIfNull(onBadOutcome);
+        AssertInitialized();
 
-        if (_isGoodOutcome)
-        {
-            return await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false);
-        }
-
-        throw new InvalidOperationException(InvalidStateErrorMsg);
+        return _state == StateGood
+            ? await onGoodOutcome(GetGoodOutcome()).ConfigureAwait(false)
+            : await onBadOutcome(GetBadOutcome()).ConfigureAwait(false);
     }
 
-
-    /// <summary>
-    /// Matches the outcome and asynchronously executes the appropriate delegate based on whether the outcome is good or bad.
-    /// </summary>
-    /// <typeparam name="TOutput">The type of the output.</typeparam>
-    /// <param name="onGoodOutcome">The asynchronous delegate to execute if the outcome is good.</param>
-    /// <param name="onBadOutcome">The delegate to execute if the outcome is bad.</param>
-    /// <returns>A task that represents the asynchronous operation and contains the result of executing the appropriate delegate.</returns>
-    public async Task<TOutput> MatchAsync<TOutput>(Func<TGoodOutcome, Task<TOutput>> onGoodOutcome,
+    public async Task<TOutput> MatchAsync<TOutput>(
+        Func<TGoodOutcome, Task<TOutput>> onGoodOutcome,
         Func<TBadOutcome, TOutput> onBadOutcome)
     {
-        if (_isBadOutcome)
-        {
-            return onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
-        }
+        ArgumentNullException.ThrowIfNull(onGoodOutcome);
+        ArgumentNullException.ThrowIfNull(onBadOutcome);
+        AssertInitialized();
 
-        if (_isGoodOutcome)
-        {
-            return await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false);
-        }
-
-        throw new InvalidOperationException(InvalidStateErrorMsg);
+        return _state == StateGood
+            ? await onGoodOutcome(GetGoodOutcome()).ConfigureAwait(false)
+            : onBadOutcome(GetBadOutcome());
     }
 
-
-    /// <summary>
-    /// Matches the outcome and asynchronously executes the appropriate delegate based on whether the outcome is good or bad.
-    /// </summary>
-    /// <typeparam name="TOutput">The type of the output.</typeparam>
-    /// <param name="onGoodOutcome">The delegate to execute if the outcome is good.</param>
-    /// <param name="onBadOutcome">The asynchronous delegate to execute if the outcome is bad.</param>
-    /// <returns>A task that represents the asynchronous operation and contains the result of executing the appropriate delegate.</returns>
-    public async Task<TOutput> MatchAsync<TOutput>(Func<TGoodOutcome, TOutput> onGoodOutcome,
+    public async Task<TOutput> MatchAsync<TOutput>(
+        Func<TGoodOutcome, TOutput> onGoodOutcome,
         Func<TBadOutcome, Task<TOutput>> onBadOutcome)
     {
-        return _isBadOutcome
-            ? await onBadOutcome(_badOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false)
-            : onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
+        ArgumentNullException.ThrowIfNull(onGoodOutcome);
+        ArgumentNullException.ThrowIfNull(onBadOutcome);
+        AssertInitialized();
+
+        return _state == StateGood
+            ? onGoodOutcome(GetGoodOutcome())
+            : await onBadOutcome(GetBadOutcome()).ConfigureAwait(false);
     }
 
-    /// <summary>
-    /// Executes the appropriate delegate based on whether the outcome is good or bad.
-    /// </summary>
-    /// <param name="onGoodOutcome">The delegate to execute if the outcome is good.</param>
-    /// <param name="onBadOutcome">The delegate to execute if the outcome is bad.</param>
-    public void Switch(Action<TGoodOutcome> onGoodOutcome, Action<TBadOutcome> onBadOutcome)
+    public void Switch(
+        Action<TGoodOutcome> onGoodOutcome,
+        Action<TBadOutcome> onBadOutcome)
     {
-        if (_isBadOutcome)
-        {
-            onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
-        }
-        else if (_isGoodOutcome)
-        {
-            onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
-        }
+        ArgumentNullException.ThrowIfNull(onGoodOutcome);
+        ArgumentNullException.ThrowIfNull(onBadOutcome);
+        AssertInitialized();
 
+        if (_state == StateGood)
+        {
+            onGoodOutcome(GetGoodOutcome());
+        }
         else
         {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
+            onBadOutcome(GetBadOutcome());
         }
     }
 
-
-    /// <summary>
-    /// Asynchronously executes the appropriate delegate based on whether the outcome is good or bad.
-    /// </summary>
-    /// <param name="onGoodOutcome">The asynchronous delegate to execute if the outcome is good.</param>
-    /// <param name="onBadOutcome">The asynchronous delegate to execute if the outcome is bad.</param>
-    public async Task SwitchAsync(Func<TGoodOutcome, Task> onGoodOutcome, Func<TBadOutcome, Task> onBadOutcome)
+    public async Task SwitchAsync(
+        Func<TGoodOutcome, Task> onGoodOutcome,
+        Func<TBadOutcome, Task> onBadOutcome)
     {
-        if (_isBadOutcome)
-        {
-            await onBadOutcome(_badOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false);
-        }
-        else if (_isGoodOutcome)
-        {
-            await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false);
-        }
+        ArgumentNullException.ThrowIfNull(onGoodOutcome);
+        ArgumentNullException.ThrowIfNull(onBadOutcome);
+        AssertInitialized();
 
+        if (_state == StateGood)
+        {
+            await onGoodOutcome(GetGoodOutcome()).ConfigureAwait(false);
+        }
         else
         {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
+            await onBadOutcome(GetBadOutcome()).ConfigureAwait(false);
         }
     }
 
-
-    /// <summary>
-    /// Asynchronously executes the appropriate delegate based on whether the outcome is good or bad.
-    /// </summary>
-    /// <param name="onGoodOutcome">The asynchronous delegate to execute if the outcome is good.</param>
-    /// <param name="onBadOutcome">The delegate to execute if the outcome is bad.</param>
-    /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task SwitchAsync(Func<TGoodOutcome, Task> onGoodOutcome, Action<TBadOutcome> onBadOutcome)
+    public async Task SwitchAsync(
+        Func<TGoodOutcome, Task> onGoodOutcome,
+        Action<TBadOutcome> onBadOutcome)
     {
-        if (_isBadOutcome)
-        {
-            onBadOutcome(_badOutcome ?? throw new InvalidOperationException());
-        }
-        else if (_isGoodOutcome)
-        {
-            await onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false);
-        }
+        ArgumentNullException.ThrowIfNull(onGoodOutcome);
+        ArgumentNullException.ThrowIfNull(onBadOutcome);
+        AssertInitialized();
 
+        if (_state == StateGood)
+        {
+            await onGoodOutcome(GetGoodOutcome()).ConfigureAwait(false);
+        }
         else
         {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
+            onBadOutcome(GetBadOutcome());
         }
     }
 
-
-    /// <summary>
-    /// Asynchronously executes the appropriate delegate based on whether the outcome is good or bad.
-    /// </summary>
-    /// <param name="onGoodOutcome">The delegate to execute if the outcome is good.</param>
-    /// <param name="onBadOutcome">The asynchronous delegate to execute if the outcome is bad.</param>
-    public async Task SwitchAsync(Action<TGoodOutcome> onGoodOutcome, Func<TBadOutcome, Task> onBadOutcome)
+    public async Task SwitchAsync(
+        Action<TGoodOutcome> onGoodOutcome,
+        Func<TBadOutcome, Task> onBadOutcome)
     {
-        if (_isBadOutcome)
-        {
-            await onBadOutcome(_badOutcome ?? throw new InvalidOperationException()).ConfigureAwait(false);
-        }
-        else if (_isGoodOutcome)
-        {
-            onGoodOutcome(_goodOutcome ?? throw new InvalidOperationException());
-        }
+        ArgumentNullException.ThrowIfNull(onGoodOutcome);
+        ArgumentNullException.ThrowIfNull(onBadOutcome);
+        AssertInitialized();
 
+        if (_state == StateGood)
+        {
+            onGoodOutcome(GetGoodOutcome());
+        }
         else
         {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
+            await onBadOutcome(GetBadOutcome()).ConfigureAwait(false);
         }
     }
 
-    private void CheckInvalidState()
+    public override string ToString()
     {
-        if (!_isGoodOutcome && !_isBadOutcome)
+        return _state switch
         {
-            throw new InvalidOperationException(InvalidStateErrorMsg);
+            StateGood => $"Good({_goodOutcome})",
+            StateBad => $"Bad({_badOutcome})",
+            _ => "Uninitialized"
+        };
+    }
+
+    private TGoodOutcome GetGoodOutcome()
+    {
+        if (_goodOutcome != null)
+        {
+            return _goodOutcome;
+        }
+
+        throw new InvalidOperationException("Good outcome value was null or uninitialized.");
+    }
+
+    private TBadOutcome GetBadOutcome()
+    {
+        if (_badOutcome != null)
+        {
+            return _badOutcome;
+        }
+
+        throw new InvalidOperationException("Bad outcome value was null or uninitialized.");
+    }
+
+    private void AssertInitialized()
+    {
+        if (_state == StateUninitialized)
+        {
+            ThrowInvalidOperationException("The Outcome instance is uninitialized.");
         }
     }
+
+    [DoesNotReturn]
+    private static void ThrowInvalidOperationException(string message) =>
+        throw new InvalidOperationException(message);
 }

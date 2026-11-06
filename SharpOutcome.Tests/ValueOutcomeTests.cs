@@ -16,8 +16,8 @@ public class ValueOutcomeTests
         var outcome = new ValueOutcome<string, int>("success");
 
         // Assert
-        outcome.IsGoodOutcome().ShouldBeTrue();
-        outcome.IsBadOutcome().ShouldBeFalse();
+        outcome.IsGoodOutcome.ShouldBeTrue();
+        outcome.IsBadOutcome.ShouldBeFalse();
     }
 
     [Fact]
@@ -27,8 +27,8 @@ public class ValueOutcomeTests
         var outcome = new ValueOutcome<string, int>(404);
 
         // Assert
-        outcome.IsGoodOutcome().ShouldBeFalse();
-        outcome.IsBadOutcome().ShouldBeTrue();
+        outcome.IsGoodOutcome.ShouldBeFalse();
+        outcome.IsBadOutcome.ShouldBeTrue();
     }
 
     #endregion
@@ -42,8 +42,8 @@ public class ValueOutcomeTests
         ValueOutcome<string, int> outcome = "success";
 
         // Assert
-        outcome.IsGoodOutcome().ShouldBeTrue();
-        outcome.IsBadOutcome().ShouldBeFalse();
+        outcome.IsGoodOutcome.ShouldBeTrue();
+        outcome.IsBadOutcome.ShouldBeFalse();
     }
 
     [Fact]
@@ -53,8 +53,8 @@ public class ValueOutcomeTests
         ValueOutcome<string, int> outcome = 404;
 
         // Assert
-        outcome.IsGoodOutcome().ShouldBeFalse();
-        outcome.IsBadOutcome().ShouldBeTrue();
+        outcome.IsGoodOutcome.ShouldBeFalse();
+        outcome.IsBadOutcome.ShouldBeTrue();
     }
 
     #endregion
@@ -68,7 +68,7 @@ public class ValueOutcomeTests
         var outcome = new ValueOutcome<string, int>("success");
 
         // Act & Assert
-        outcome.IsGoodOutcome().ShouldBeTrue();
+        outcome.IsGoodOutcome.ShouldBeTrue();
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public class ValueOutcomeTests
         var outcome = new ValueOutcome<string, int>(404);
 
         // Act & Assert
-        outcome.IsGoodOutcome().ShouldBeFalse();
+        outcome.IsGoodOutcome.ShouldBeFalse();
     }
 
     #endregion
@@ -92,7 +92,7 @@ public class ValueOutcomeTests
         var outcome = new ValueOutcome<string, int>(404);
 
         // Act & Assert
-        outcome.IsBadOutcome().ShouldBeTrue();
+        outcome.IsBadOutcome.ShouldBeTrue();
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public class ValueOutcomeTests
         var outcome = new ValueOutcome<string, int>("success");
 
         // Act & Assert
-        outcome.IsBadOutcome().ShouldBeFalse();
+        outcome.IsBadOutcome.ShouldBeFalse();
     }
 
     #endregion
@@ -666,7 +666,7 @@ public class ValueOutcomeTests
         var finalOutcome = new ValueOutcome<int, string>(intermediateResult);
 
         // Assert
-        finalOutcome.IsGoodOutcome().ShouldBeTrue();
+        finalOutcome.IsGoodOutcome.ShouldBeTrue();
         finalOutcome.TryPickGoodOutcome(out var value);
         value.ShouldBe(84);
     }
@@ -678,7 +678,7 @@ public class ValueOutcomeTests
         var result = GetUserAge(25);
 
         // Assert
-        result.IsGoodOutcome().ShouldBeTrue();
+        result.IsGoodOutcome.ShouldBeTrue();
         result.TryPickGoodOutcome(out var age);
         age.ShouldBe(25);
     }
@@ -690,7 +690,7 @@ public class ValueOutcomeTests
         var result = GetUserAge(-5);
 
         // Assert
-        result.IsBadOutcome().ShouldBeTrue();
+        result.IsBadOutcome.ShouldBeTrue();
         result.TryPickBadOutcome(out var error);
         error.ShouldBe("Invalid age");
     }
@@ -716,7 +716,7 @@ public class ValueOutcomeTests
         var outcome = new ValueOutcome<int, string>(42);
 
         // Act - This would be stack allocated
-        var isGood = outcome.IsGoodOutcome();
+        var isGood = outcome.IsGoodOutcome;
 
         // Assert
         isGood.ShouldBeTrue();

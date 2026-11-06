@@ -13,8 +13,8 @@ public class OutcomeTests
         var outcome = new Outcome<string, int>("success");
 
         // Assert
-        outcome.IsGoodOutcome().ShouldBeTrue();
-        outcome.IsBadOutcome().ShouldBeFalse();
+        outcome.IsGoodOutcome.ShouldBeTrue();
+        outcome.IsBadOutcome.ShouldBeFalse();
     }
 
     [Fact]
@@ -24,8 +24,8 @@ public class OutcomeTests
         var outcome = new Outcome<string, int>(404);
 
         // Assert
-        outcome.IsGoodOutcome().ShouldBeFalse();
-        outcome.IsBadOutcome().ShouldBeTrue();
+        outcome.IsGoodOutcome.ShouldBeFalse();
+        outcome.IsBadOutcome.ShouldBeTrue();
     }
 
     #endregion
@@ -39,8 +39,8 @@ public class OutcomeTests
         Outcome<string, int> outcome = "success";
 
         // Assert
-        outcome.IsGoodOutcome().ShouldBeTrue();
-        outcome.IsBadOutcome().ShouldBeFalse();
+        outcome.IsGoodOutcome.ShouldBeTrue();
+        outcome.IsBadOutcome.ShouldBeFalse();
     }
 
     [Fact]
@@ -50,8 +50,8 @@ public class OutcomeTests
         Outcome<string, int> outcome = 404;
 
         // Assert
-        outcome.IsGoodOutcome().ShouldBeFalse();
-        outcome.IsBadOutcome().ShouldBeTrue();
+        outcome.IsGoodOutcome.ShouldBeFalse();
+        outcome.IsBadOutcome.ShouldBeTrue();
     }
 
     #endregion
@@ -65,7 +65,7 @@ public class OutcomeTests
         var outcome = new Outcome<string, int>("success");
 
         // Act & Assert
-        outcome.IsGoodOutcome().ShouldBeTrue();
+        outcome.IsGoodOutcome.ShouldBeTrue();
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class OutcomeTests
         var outcome = new Outcome<string, int>(404);
 
         // Act & Assert
-        outcome.IsGoodOutcome().ShouldBeFalse();
+        outcome.IsGoodOutcome.ShouldBeFalse();
     }
 
     #endregion
@@ -89,7 +89,7 @@ public class OutcomeTests
         var outcome = new Outcome<string, int>(404);
 
         // Act & Assert
-        outcome.IsBadOutcome().ShouldBeTrue();
+        outcome.IsBadOutcome.ShouldBeTrue();
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public class OutcomeTests
         var outcome = new Outcome<string, int>("success");
 
         // Act & Assert
-        outcome.IsBadOutcome().ShouldBeFalse();
+        outcome.IsBadOutcome.ShouldBeFalse();
     }
 
     #endregion
@@ -612,7 +612,7 @@ public class OutcomeTests
         var finalOutcome = new Outcome<int, string>(intermediateResult);
 
         // Assert
-        finalOutcome.IsGoodOutcome().ShouldBeTrue();
+        finalOutcome.IsGoodOutcome.ShouldBeTrue();
         finalOutcome.TryPickGoodOutcome(out var value);
         value.ShouldBe(84);
     }

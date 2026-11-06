@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="SharpOutcome.Tests/SharpOutcome.Tests.csproj" />
+  <Project Path="src/SharpOutcome.HttpApiExample/SharpOutcome.HttpApiExample.csproj" />
+  <Project Path="src/SharpOutcome/SharpOutcome.csproj" />
+</Solution>
