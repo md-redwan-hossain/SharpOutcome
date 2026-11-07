@@ -1,7 +1,6 @@
 using Shouldly;
 using SharpOutcome.Helpers;
 
-// using Shouldly; (removed duplicate)
 
 namespace SharpOutcome.Tests;
 
@@ -766,7 +765,7 @@ public class ValueOutcomeTests
         // Arrange
         var entered = false;
         var outcome = ReturnSuccessOrFailed(returnSuccess: false);
-        
+
         // Act
         if (outcome.TryPickBadOutcome(out _, out var goodOutcome))
         {

@@ -11,7 +11,10 @@ namespace SharpOutcome.HttpApiExample.Services;
 public class BookService : IBookService
 {
     private readonly BookDbContext _bookDbContext;
-    public BookService(BookDbContext bookDbContext) => _bookDbContext = bookDbContext;
+    public BookService(BookDbContext bookDbContext)
+    {
+        _bookDbContext = bookDbContext;
+    }
 
     public async Task<ValueOutcome<Book, IBadOutcome>> CreateAsync(BookRequest dto)
     {

@@ -11,7 +11,10 @@ namespace SharpOutcome.HttpApiExample.Controllers;
 public sealed class BookController : ControllerBase
 {
     private readonly IBookService _bookService;
-    public BookController(IBookService bookService) => _bookService = bookService;
+    public BookController(IBookService bookService)
+    {
+        _bookService = bookService;
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetBook()

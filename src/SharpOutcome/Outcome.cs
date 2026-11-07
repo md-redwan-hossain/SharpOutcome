@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace SharpOutcome;
@@ -10,7 +11,7 @@ namespace SharpOutcome;
 /// </summary>
 /// <typeparam name="TGoodOutcome">The type of the good outcome.</typeparam>
 /// <typeparam name="TBadOutcome">The type of the bad outcome.</typeparam>
-public class Outcome<TGoodOutcome, TBadOutcome>
+public sealed record Outcome<TGoodOutcome, TBadOutcome>
     where TGoodOutcome : notnull
     where TBadOutcome : notnull
 {
@@ -21,6 +22,25 @@ public class Outcome<TGoodOutcome, TBadOutcome>
     private readonly TGoodOutcome? _goodOutcome;
     private readonly TBadOutcome? _badOutcome;
     private readonly byte _state;
+
+    private Outcome(byte state, TGoodOutcome? goodOutcome, TBadOutcome? badOutcome)
+    {
+        _state = state;
+        _goodOutcome = goodOutcome;
+        _badOutcome = badOutcome;
+    }
+
+    public static Outcome<TGoodOutcome, TBadOutcome> Good(TGoodOutcome goodOutcome)
+    {
+        ArgumentNullException.ThrowIfNull(goodOutcome);
+        return new Outcome<TGoodOutcome, TBadOutcome>(StateGood, goodOutcome, default);
+    }
+
+    public static Outcome<TGoodOutcome, TBadOutcome> Bad(TBadOutcome badOutcome)
+    {
+        ArgumentNullException.ThrowIfNull(badOutcome);
+        return new Outcome<TGoodOutcome, TBadOutcome>(StateBad, default, badOutcome);
+    }
 
     public Outcome(TGoodOutcome goodOutcome)
     {
@@ -62,11 +82,20 @@ public class Outcome<TGoodOutcome, TBadOutcome>
         }
     }
 
-    public static implicit operator Outcome<TGoodOutcome, TBadOutcome>(TGoodOutcome goodOutcome) =>
-        new(goodOutcome);
+    /// <summary>
+    /// Gets a value indicating whether the instance has been properly initialized.
+    /// </summary>
+    public bool IsInitialized => _state != StateUninitialized;
 
-    public static implicit operator Outcome<TGoodOutcome, TBadOutcome>(TBadOutcome badOutcome) =>
-        new(badOutcome);
+    public static implicit operator Outcome<TGoodOutcome, TBadOutcome>(TGoodOutcome goodOutcome)
+    {
+        return new Outcome<TGoodOutcome, TBadOutcome>(goodOutcome);
+    }
+
+    public static implicit operator Outcome<TGoodOutcome, TBadOutcome>(TBadOutcome badOutcome)
+    {
+        return new Outcome<TGoodOutcome, TBadOutcome>(badOutcome);
+    }
 
     /// <summary>
     /// Tries to pick the good outcome.
@@ -148,12 +177,12 @@ public class Outcome<TGoodOutcome, TBadOutcome>
     /// Deconstructs the outcome into its status and values.
     /// </summary>
     public void Deconstruct(
-        out bool isGood,
+        out bool isGoodOutcome,
         out TGoodOutcome? goodOutcome,
         out TBadOutcome? badOutcome)
     {
         AssertInitialized();
-        isGood = _state == StateGood;
+        isGoodOutcome = _state == StateGood;
         goodOutcome = _goodOutcome;
         badOutcome = _badOutcome;
     }
@@ -294,9 +323,9 @@ public class Outcome<TGoodOutcome, TBadOutcome>
 
     private TGoodOutcome GetGoodOutcome()
     {
-        if (_goodOutcome != null)
+        if (_goodOutcome is { } good)
         {
-            return _goodOutcome;
+            return good;
         }
 
         throw new InvalidOperationException("Good outcome value was null or uninitialized.");
@@ -304,23 +333,26 @@ public class Outcome<TGoodOutcome, TBadOutcome>
 
     private TBadOutcome GetBadOutcome()
     {
-        if (_badOutcome != null)
+        if (_badOutcome is { } bad)
         {
-            return _badOutcome;
+            return bad;
         }
 
         throw new InvalidOperationException("Bad outcome value was null or uninitialized.");
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void AssertInitialized()
     {
         if (_state == StateUninitialized)
         {
-            ThrowInvalidOperationException("The Outcome instance is uninitialized.");
+            ThrowUninitialized();
         }
     }
 
     [DoesNotReturn]
-    private static void ThrowInvalidOperationException(string message) =>
-        throw new InvalidOperationException(message);
+    private static void ThrowUninitialized()
+    {
+        throw new InvalidOperationException("The Outcome instance is uninitialized.");
+    }
 }

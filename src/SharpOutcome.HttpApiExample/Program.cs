@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SharpOutcome;
-using SharpOutcome.Helpers;
-using SharpOutcome.Helpers.Enums;
 using SharpOutcome.HttpApiExample.Controllers;
 using SharpOutcome.HttpApiExample.Data;
 using SharpOutcome.HttpApiExample.Services;
