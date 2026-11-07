@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using SharpOutcome;
 using SharpOutcome.HttpApiExample.Controllers;
 using SharpOutcome.HttpApiExample.Data;
 using SharpOutcome.HttpApiExample.Services;

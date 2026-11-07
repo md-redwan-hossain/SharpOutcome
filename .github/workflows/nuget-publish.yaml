@@ -1,0 +1,57 @@
+﻿name: nuget-publish
+run-name: "${{ github.workflow }} | ${{ inputs.project }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        description: "Select project to pack and publish"
+        required: true
+        type: choice
+        options:
+          - SharpOutcome
+  workflow_call:
+    inputs:
+      project:
+        required: true
+        type: string
+
+concurrency:
+  group: nuget-publish-${{ inputs.project }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      PROJECT_PATH: src/${{ inputs.project }}/${{ inputs.project }}.csproj
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+
+      - name: Setup DotNet
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10"
+          cache: true
+          cache-dependency-path: "**/packages.lock.json"
+
+      - name: Restore dependencies
+        run: dotnet restore "${{ env.PROJECT_PATH }}" --locked-mode
+
+      - name: Pack
+        run: dotnet pack "${{ env.PROJECT_PATH }}" --configuration Release --no-restore --output ./artifacts
+
+      - name: NuGet login (OIDC)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push to NuGet.org
+        run: dotnet nuget push "./artifacts/*.nupkg" --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate

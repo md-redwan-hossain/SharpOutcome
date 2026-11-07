@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using SharpOutcome.Helpers;
 
 namespace SharpOutcome;
 
@@ -31,25 +32,6 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
         throw new InvalidOperationException("Invoking the parameterless constructor is not allowed for ValueOutcome.");
     }
 
-    private ValueOutcome(byte state, TGoodOutcome? goodOutcome, TBadOutcome? badOutcome)
-    {
-        _state = state;
-        _goodOutcome = goodOutcome;
-        _badOutcome = badOutcome;
-    }
-
-    public static ValueOutcome<TGoodOutcome, TBadOutcome> Good(TGoodOutcome goodOutcome)
-    {
-        ArgumentNullException.ThrowIfNull(goodOutcome);
-        return new ValueOutcome<TGoodOutcome, TBadOutcome>(StateGood, goodOutcome, default);
-    }
-
-    public static ValueOutcome<TGoodOutcome, TBadOutcome> Bad(TBadOutcome badOutcome)
-    {
-        ArgumentNullException.ThrowIfNull(badOutcome);
-        return new ValueOutcome<TGoodOutcome, TBadOutcome>(StateBad, default, badOutcome);
-    }
-
     public ValueOutcome(TGoodOutcome goodOutcome)
     {
         ArgumentNullException.ThrowIfNull(goodOutcome);
@@ -64,6 +46,33 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
         _badOutcome = badOutcome;
         _goodOutcome = default;
         _state = StateBad;
+    }
+
+    private ValueOutcome(byte state, TGoodOutcome? goodOutcome, TBadOutcome? badOutcome)
+    {
+        _state = state;
+        _goodOutcome = goodOutcome;
+        _badOutcome = badOutcome;
+    }
+
+    public static implicit operator ValueOutcome<TGoodOutcome, TBadOutcome>(GoodOutcome<TGoodOutcome> good)
+    {
+        return new ValueOutcome<TGoodOutcome, TBadOutcome>(StateGood, good.Value, default);
+    }
+
+    public static implicit operator ValueOutcome<TGoodOutcome, TBadOutcome>(BadOutcome<TBadOutcome> bad)
+    {
+        return new ValueOutcome<TGoodOutcome, TBadOutcome>(StateBad, default, bad.Value);
+    }
+
+    public static implicit operator ValueOutcome<TGoodOutcome, TBadOutcome>(TGoodOutcome goodOutcome)
+    {
+        return new ValueOutcome<TGoodOutcome, TBadOutcome>(goodOutcome);
+    }
+
+    public static implicit operator ValueOutcome<TGoodOutcome, TBadOutcome>(TBadOutcome badOutcome)
+    {
+        return new ValueOutcome<TGoodOutcome, TBadOutcome>(badOutcome);
     }
 
     /// <summary>
@@ -95,15 +104,6 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
     /// </summary>
     public bool IsInitialized => _state != StateUninitialized;
 
-    public static implicit operator ValueOutcome<TGoodOutcome, TBadOutcome>(TGoodOutcome goodOutcome)
-    {
-        return new ValueOutcome<TGoodOutcome, TBadOutcome>(goodOutcome);
-    }
-
-    public static implicit operator ValueOutcome<TGoodOutcome, TBadOutcome>(TBadOutcome badOutcome)
-    {
-        return new ValueOutcome<TGoodOutcome, TBadOutcome>(badOutcome);
-    }
 
     /// <summary>
     /// Tries to pick the good outcome.
@@ -363,5 +363,18 @@ public readonly record struct ValueOutcome<TGoodOutcome, TBadOutcome>
     private static void ThrowUninitialized()
     {
         throw new InvalidOperationException("The ValueOutcome instance is uninitialized.");
+    }
+}
+
+public static class ValueOutcome
+{
+    public static GoodOutcome<T> Good<T>(T value) where T : notnull
+    {
+        return new GoodOutcome<T>(value);
+    }
+
+    public static BadOutcome<T> Bad<T>(T value) where T : notnull
+    {
+        return new BadOutcome<T>(value);
     }
 }

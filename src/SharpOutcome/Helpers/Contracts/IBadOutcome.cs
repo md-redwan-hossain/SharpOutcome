@@ -1,22 +1,4 @@
-using SharpOutcome.Helpers.Enums;
-
 namespace SharpOutcome.Helpers.Contracts;
-
-/// <summary>
-/// Enforces a contract for bad outcome.
-/// </summary>
-public interface IBadOutcome
-{
-    /// <summary>
-    /// Gets the type of the bad outcome.
-    /// </summary>
-    BadOutcomeTag Tag { get; }
-
-    /// <summary>
-    /// Gets the reason for the bad outcome.
-    /// </summary>
-    string? Reason { get; }
-}
 
 /// <summary>
 /// Enforces a contract for bad outcome.

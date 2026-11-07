@@ -1,23 +1,4 @@
-using SharpOutcome.Helpers.Enums;
-
 namespace SharpOutcome.Helpers.Contracts;
-
-/// <summary>
-/// Enforces a contract for good outcome.
-/// </summary>
-public interface IGoodOutcome
-{
-    /// <summary>
-    /// Gets the unique tag of the good outcome.
-    /// </summary>
-    GoodOutcomeTag Tag { get; }
-
-    /// <summary>
-    /// Gets the reason for the good outcome.
-    /// </summary>
-    string? Reason { get; }
-}
-
 
 /// <summary>
 /// Enforces a contract for good outcome.

@@ -2,11 +2,12 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using SharpOutcome.Helpers;
 
 namespace SharpOutcome;
 
 /// <summary>
-/// Represents an outcome that can either be a good outcome of type <typeparamref name="TGoodOutcome"/> 
+/// Represents a heap-allocated outcome that can either be a good outcome of type <typeparamref name="TGoodOutcome"/> 
 /// or a bad outcome of type <typeparamref name="TBadOutcome"/>.
 /// </summary>
 /// <typeparam name="TGoodOutcome">The type of the good outcome.</typeparam>
@@ -30,18 +31,6 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
         _badOutcome = badOutcome;
     }
 
-    public static Outcome<TGoodOutcome, TBadOutcome> Good(TGoodOutcome goodOutcome)
-    {
-        ArgumentNullException.ThrowIfNull(goodOutcome);
-        return new Outcome<TGoodOutcome, TBadOutcome>(StateGood, goodOutcome, default);
-    }
-
-    public static Outcome<TGoodOutcome, TBadOutcome> Bad(TBadOutcome badOutcome)
-    {
-        ArgumentNullException.ThrowIfNull(badOutcome);
-        return new Outcome<TGoodOutcome, TBadOutcome>(StateBad, default, badOutcome);
-    }
-
     public Outcome(TGoodOutcome goodOutcome)
     {
         ArgumentNullException.ThrowIfNull(goodOutcome);
@@ -57,6 +46,12 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
         _goodOutcome = default;
         _state = StateBad;
     }
+
+    private TGoodOutcome GoodOutcome =>
+        _goodOutcome != null ? _goodOutcome : ThrowInvalidOutcomeState<TGoodOutcome>();
+
+    private TBadOutcome BadOutcome =>
+        _badOutcome != null ? _badOutcome : ThrowInvalidOutcomeState<TBadOutcome>();
 
     /// <summary>
     /// Gets a value indicating whether the outcome is a good outcome.
@@ -87,6 +82,16 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
     /// </summary>
     public bool IsInitialized => _state != StateUninitialized;
 
+    public static implicit operator Outcome<TGoodOutcome, TBadOutcome>(GoodOutcome<TGoodOutcome> good)
+    {
+        return new Outcome<TGoodOutcome, TBadOutcome>(StateGood, good.Value, default);
+    }
+
+    public static implicit operator Outcome<TGoodOutcome, TBadOutcome>(BadOutcome<TBadOutcome> bad)
+    {
+        return new Outcome<TGoodOutcome, TBadOutcome>(StateBad, default, bad.Value);
+    }
+
     public static implicit operator Outcome<TGoodOutcome, TBadOutcome>(TGoodOutcome goodOutcome)
     {
         return new Outcome<TGoodOutcome, TBadOutcome>(goodOutcome);
@@ -106,7 +111,7 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
 
         if (_state == StateGood)
         {
-            goodOutcome = GetGoodOutcome();
+            goodOutcome = GoodOutcome;
             return true;
         }
 
@@ -123,7 +128,7 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
 
         if (_state == StateBad)
         {
-            badOutcome = GetBadOutcome();
+            badOutcome = BadOutcome;
             return true;
         }
 
@@ -142,13 +147,13 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
 
         if (_state == StateGood)
         {
-            goodOutcome = GetGoodOutcome();
+            goodOutcome = GoodOutcome;
             badOutcome = default;
             return true;
         }
 
         goodOutcome = default;
-        badOutcome = GetBadOutcome();
+        badOutcome = BadOutcome;
         return false;
     }
 
@@ -163,13 +168,13 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
 
         if (_state == StateBad)
         {
-            badOutcome = GetBadOutcome();
+            badOutcome = BadOutcome;
             goodOutcome = default;
             return true;
         }
 
         badOutcome = default;
-        goodOutcome = GetGoodOutcome();
+        goodOutcome = GoodOutcome;
         return false;
     }
 
@@ -196,8 +201,8 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
         AssertInitialized();
 
         return _state == StateGood
-            ? onGoodOutcome(GetGoodOutcome())
-            : onBadOutcome(GetBadOutcome());
+            ? onGoodOutcome(GoodOutcome)
+            : onBadOutcome(BadOutcome);
     }
 
     public async Task<TOutput> MatchAsync<TOutput>(
@@ -209,8 +214,8 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
         AssertInitialized();
 
         return _state == StateGood
-            ? await onGoodOutcome(GetGoodOutcome()).ConfigureAwait(false)
-            : await onBadOutcome(GetBadOutcome()).ConfigureAwait(false);
+            ? await onGoodOutcome(GoodOutcome).ConfigureAwait(false)
+            : await onBadOutcome(BadOutcome).ConfigureAwait(false);
     }
 
     public async Task<TOutput> MatchAsync<TOutput>(
@@ -222,8 +227,8 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
         AssertInitialized();
 
         return _state == StateGood
-            ? await onGoodOutcome(GetGoodOutcome()).ConfigureAwait(false)
-            : onBadOutcome(GetBadOutcome());
+            ? await onGoodOutcome(GoodOutcome).ConfigureAwait(false)
+            : onBadOutcome(BadOutcome);
     }
 
     public async Task<TOutput> MatchAsync<TOutput>(
@@ -235,8 +240,8 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
         AssertInitialized();
 
         return _state == StateGood
-            ? onGoodOutcome(GetGoodOutcome())
-            : await onBadOutcome(GetBadOutcome()).ConfigureAwait(false);
+            ? onGoodOutcome(GoodOutcome)
+            : await onBadOutcome(BadOutcome).ConfigureAwait(false);
     }
 
     public void Switch(
@@ -249,11 +254,11 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
 
         if (_state == StateGood)
         {
-            onGoodOutcome(GetGoodOutcome());
+            onGoodOutcome(GoodOutcome);
         }
         else
         {
-            onBadOutcome(GetBadOutcome());
+            onBadOutcome(BadOutcome);
         }
     }
 
@@ -267,11 +272,11 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
 
         if (_state == StateGood)
         {
-            await onGoodOutcome(GetGoodOutcome()).ConfigureAwait(false);
+            await onGoodOutcome(GoodOutcome).ConfigureAwait(false);
         }
         else
         {
-            await onBadOutcome(GetBadOutcome()).ConfigureAwait(false);
+            await onBadOutcome(BadOutcome).ConfigureAwait(false);
         }
     }
 
@@ -285,11 +290,11 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
 
         if (_state == StateGood)
         {
-            await onGoodOutcome(GetGoodOutcome()).ConfigureAwait(false);
+            await onGoodOutcome(GoodOutcome).ConfigureAwait(false);
         }
         else
         {
-            onBadOutcome(GetBadOutcome());
+            onBadOutcome(BadOutcome);
         }
     }
 
@@ -303,11 +308,11 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
 
         if (_state == StateGood)
         {
-            onGoodOutcome(GetGoodOutcome());
+            onGoodOutcome(GoodOutcome);
         }
         else
         {
-            await onBadOutcome(GetBadOutcome()).ConfigureAwait(false);
+            await onBadOutcome(BadOutcome).ConfigureAwait(false);
         }
     }
 
@@ -319,26 +324,6 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
             StateBad => $"Bad({_badOutcome})",
             _ => "Uninitialized"
         };
-    }
-
-    private TGoodOutcome GetGoodOutcome()
-    {
-        if (_goodOutcome is { } good)
-        {
-            return good;
-        }
-
-        throw new InvalidOperationException("Good outcome value was null or uninitialized.");
-    }
-
-    private TBadOutcome GetBadOutcome()
-    {
-        if (_badOutcome is { } bad)
-        {
-            return bad;
-        }
-
-        throw new InvalidOperationException("Bad outcome value was null or uninitialized.");
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -355,4 +340,20 @@ public sealed record Outcome<TGoodOutcome, TBadOutcome>
     {
         throw new InvalidOperationException("The Outcome instance is uninitialized.");
     }
+
+    [DoesNotReturn]
+    private static T ThrowInvalidOutcomeState<T>()
+    {
+        throw new InvalidOperationException("Outcome value was null or uninitialized.");
+    }
+}
+
+/// <summary>
+/// Static factory methods for creating outcome markers with compiler type inference.
+/// </summary>
+public static class Outcome
+{
+    public static GoodOutcome<T> Good<T>(T value) where T : notnull => new(value);
+
+    public static BadOutcome<T> Bad<T>(T value) where T : notnull => new(value);
 }

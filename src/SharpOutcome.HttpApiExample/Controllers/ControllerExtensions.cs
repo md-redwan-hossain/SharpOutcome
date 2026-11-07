@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using SharpOutcome.Helpers.Contracts;
+using SharpOutcome.Helpers;
 using SharpOutcome.Helpers.Enums;
 using SharpOutcome.HttpApiExample.Utils;
 
@@ -8,13 +8,13 @@ namespace SharpOutcome.HttpApiExample.Controllers;
 
 public static class ControllerExtensions
 {
-    public static IActionResult MakeResponse(this ActionContext context, IGoodOutcome success)
+    public static IActionResult MakeResponse(this ActionContext context, HttpGoodOutcome success)
     {
         var code = success.Tag switch
         {
-            GoodOutcomeTag.Ok => StatusCodes.Status200OK,
-            GoodOutcomeTag.Created => StatusCodes.Status201Created,
-            GoodOutcomeTag.Deleted => StatusCodes.Status204NoContent,
+            HttpGoodOutcomeTag.Ok => StatusCodes.Status200OK,
+            HttpGoodOutcomeTag.Created => StatusCodes.Status201Created,
+            HttpGoodOutcomeTag.NoContent => StatusCodes.Status204NoContent,
             _ => StatusCodes.Status200OK
         };
 
@@ -22,17 +22,16 @@ public static class ControllerExtensions
     }
 
 
-    public static IActionResult MakeResponse(this ActionContext context, IBadOutcome error)
+    public static IActionResult MakeResponse(this ActionContext context, HttpBadOutcome error)
     {
         var code = error.Tag switch
         {
-            BadOutcomeTag.Failure => StatusCodes.Status500InternalServerError,
-            BadOutcomeTag.Unexpected => StatusCodes.Status500InternalServerError,
-            BadOutcomeTag.BadRequest => StatusCodes.Status400BadRequest,
-            BadOutcomeTag.Conflict => StatusCodes.Status409Conflict,
-            BadOutcomeTag.NotFound => StatusCodes.Status404NotFound,
-            BadOutcomeTag.Unauthorized => StatusCodes.Status401Unauthorized,
-            BadOutcomeTag.Forbidden => StatusCodes.Status403Forbidden,
+            HttpBadOutcomeTag.InternalServerError => StatusCodes.Status500InternalServerError,
+            HttpBadOutcomeTag.BadRequest => StatusCodes.Status400BadRequest,
+            HttpBadOutcomeTag.Conflict => StatusCodes.Status409Conflict,
+            HttpBadOutcomeTag.NotFound => StatusCodes.Status404NotFound,
+            HttpBadOutcomeTag.Unauthorized => StatusCodes.Status401Unauthorized,
+            HttpBadOutcomeTag.Forbidden => StatusCodes.Status403Forbidden,
             _ => StatusCodes.Status500InternalServerError,
         };
 

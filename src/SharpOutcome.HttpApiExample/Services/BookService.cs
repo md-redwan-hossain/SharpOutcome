@@ -1,7 +1,6 @@
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using SharpOutcome.Helpers;
-using SharpOutcome.Helpers.Contracts;
 using SharpOutcome.Helpers.Enums;
 using SharpOutcome.HttpApiExample.Data;
 using SharpOutcome.HttpApiExample.DataTransferObjects;
@@ -11,12 +10,13 @@ namespace SharpOutcome.HttpApiExample.Services;
 public class BookService : IBookService
 {
     private readonly BookDbContext _bookDbContext;
+
     public BookService(BookDbContext bookDbContext)
     {
         _bookDbContext = bookDbContext;
     }
 
-    public async Task<ValueOutcome<Book, IBadOutcome>> CreateAsync(BookRequest dto)
+    public async Task<ValueOutcome<Book, HttpBadOutcome>> CreateAsync(BookRequest dto)
     {
         try
         {
@@ -26,7 +26,7 @@ public class BookService : IBookService
 
             if (duplicateIsbn is not null)
             {
-                return new BadOutcome(BadOutcomeTag.Conflict, $"Duplicate isbn: {dto.Isbn}");
+                return new HttpBadOutcome(HttpBadOutcomeTag.Conflict, $"Duplicate isbn: {dto.Isbn}");
             }
 
             var entity = await dto.BuildAdapter().AdaptToTypeAsync<Book>();
@@ -37,16 +37,16 @@ public class BookService : IBookService
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return new BadOutcome(BadOutcomeTag.Unexpected);
+            return new HttpBadOutcome(HttpBadOutcomeTag.InternalServerError);
         }
     }
 
-    public async Task<ValueOutcome<Book, IBadOutcome>> UpdateAsync(int id, BookRequest dto)
+    public async Task<ValueOutcome<Book, HttpBadOutcome>> UpdateAsync(int id, BookRequest dto)
     {
         try
         {
-            var entityToUpdate = await _bookDbContext.Books.FirstOrDefaultAsync(x=>x.Id == id);
-            if (entityToUpdate is null) return new BadOutcome(BadOutcomeTag.NotFound);
+            var entityToUpdate = await _bookDbContext.Books.FirstOrDefaultAsync(x => x.Id == id);
+            if (entityToUpdate is null) return new HttpBadOutcome(HttpBadOutcomeTag.NotFound);
 
             await dto.BuildAdapter().AdaptToAsync(entityToUpdate);
             _bookDbContext.Books.Attach(entityToUpdate);
@@ -57,7 +57,7 @@ public class BookService : IBookService
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return new BadOutcome(BadOutcomeTag.Unexpected);
+            return new HttpBadOutcome(HttpBadOutcomeTag.InternalServerError);
         }
     }
 
@@ -66,19 +66,19 @@ public class BookService : IBookService
         return await _bookDbContext.Books.ToListAsync();
     }
 
-    public async Task<ValueOutcome<Book, IBadOutcome>> GetOneAsync(int id)
+    public async Task<ValueOutcome<Book, HttpBadOutcome>> GetOneAsync(int id)
     {
         var entity = await _bookDbContext.Books.FindAsync(id);
-        if (entity is null) return new BadOutcome(BadOutcomeTag.NotFound);
+        if (entity is null) return new HttpBadOutcome(HttpBadOutcomeTag.NotFound);
         return entity;
     }
 
-    public async Task<ValueOutcome<IGoodOutcome, IBadOutcome>> RemoveAsync(int id)
+    public async Task<ValueOutcome<HttpGoodOutcome, HttpBadOutcome>> RemoveAsync(int id)
     {
         try
         {
             var entityToDelete = await _bookDbContext.Books.FindAsync(id);
-            if (entityToDelete is null) return new BadOutcome(BadOutcomeTag.NotFound);
+            if (entityToDelete is null) return new HttpBadOutcome(HttpBadOutcomeTag.NotFound);
 
             if (_bookDbContext.Entry(entityToDelete).State is EntityState.Detached)
             {
@@ -88,12 +88,12 @@ public class BookService : IBookService
             _bookDbContext.Books.Remove(entityToDelete);
             await _bookDbContext.SaveChangesAsync();
 
-            return new GoodOutcome(GoodOutcomeTag.Deleted);
+            return new HttpGoodOutcome(HttpGoodOutcomeTag.NoContent);
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
-            return new BadOutcome(BadOutcomeTag.Unexpected);
+            return new HttpBadOutcome(HttpBadOutcomeTag.InternalServerError);
         }
     }
 }
