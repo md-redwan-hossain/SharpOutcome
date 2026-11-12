@@ -16,7 +16,7 @@ public class BookService : IBookService
         _bookDbContext = bookDbContext;
     }
 
-    public async Task<ValueOutcome<Book, HttpBadOutcome>> CreateAsync(BookRequest dto)
+    public async Task<HttpOutcome<Book>> CreateAsync(BookRequest dto)
     {
         try
         {
@@ -32,7 +32,7 @@ public class BookService : IBookService
             var entity = await dto.BuildAdapter().AdaptToTypeAsync<Book>();
             await _bookDbContext.Books.AddAsync(entity);
             await _bookDbContext.SaveChangesAsync();
-            return entity;
+            return new HttpGoodOutcome<Book>(HttpGoodOutcomeTag.Created, entity);
         }
         catch (Exception e)
         {

@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using SharpOutcome.Helpers;
+using SharpOutcome.HttpApiExample.Data;
 using SharpOutcome.HttpApiExample.DataTransferObjects;
 using SharpOutcome.HttpApiExample.Services;
 
@@ -11,6 +13,7 @@ namespace SharpOutcome.HttpApiExample.Controllers;
 public sealed class BookController : ControllerBase
 {
     private readonly IBookService _bookService;
+
     public BookController(IBookService bookService)
     {
         _bookService = bookService;
@@ -57,13 +60,12 @@ public sealed class BookController : ControllerBase
         {
             return ControllerContext.MakeResponse(StatusCodes.Status400BadRequest);
         }
-
-        var result = await _bookService.CreateAsync(dto);
-
-        return result.Match(
-            entity => ControllerContext.MakeResponse(StatusCodes.Status201Created, entity),
-            err => ControllerContext.MakeResponse(err)
-        );
+        
+        return await _bookService.CreateAsync(dto) switch
+        {
+            HttpGoodOutcome<Book> data => ControllerContext.MakeResponse(StatusCodes.Status201Created, data),
+            HttpBadOutcome err => ControllerContext.MakeResponse(err)
+        };
     }
 
     [HttpDelete("{id:int}")]
