@@ -45,12 +45,11 @@ public sealed class BookController : ControllerBase
             return ControllerContext.MakeResponse(StatusCodes.Status400BadRequest);
         }
 
-        var result = await _bookService.UpdateAsync(id, dto);
-
-        return result.Match(
-            entity => ControllerContext.MakeResponse(StatusCodes.Status200OK, entity),
-            err => ControllerContext.MakeResponse(StatusCodes.Status304NotModified, err)
-        );
+        return await _bookService.UpdateAsync(id, dto) switch
+        {
+            HttpGoodOutcome<Book> data => ControllerContext.MakeResponse(StatusCodes.Status201Created, data),
+            HttpBadOutcome err => ControllerContext.MakeResponse(err)
+        };
     }
 
     [HttpPost]
@@ -60,7 +59,7 @@ public sealed class BookController : ControllerBase
         {
             return ControllerContext.MakeResponse(StatusCodes.Status400BadRequest);
         }
-        
+
         return await _bookService.CreateAsync(dto) switch
         {
             HttpGoodOutcome<Book> data => ControllerContext.MakeResponse(StatusCodes.Status201Created, data),

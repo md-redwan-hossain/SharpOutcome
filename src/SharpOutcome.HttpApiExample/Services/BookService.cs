@@ -16,7 +16,7 @@ public class BookService : IBookService
         _bookDbContext = bookDbContext;
     }
 
-    public async Task<HttpOutcome<Book>> CreateAsync(BookRequest dto)
+    public async Task<HttpUnionOutcome<Book>> CreateAsync(BookRequest dto)
     {
         try
         {
@@ -41,7 +41,7 @@ public class BookService : IBookService
         }
     }
 
-    public async Task<ValueOutcome<Book, HttpBadOutcome>> UpdateAsync(int id, BookRequest dto)
+    public async Task<HttpUnionOutcome<Book>> UpdateAsync(int id, BookRequest dto)
     {
         try
         {
@@ -52,7 +52,7 @@ public class BookService : IBookService
             _bookDbContext.Books.Attach(entityToUpdate);
             _bookDbContext.Entry(entityToUpdate).State = EntityState.Modified;
             await _bookDbContext.SaveChangesAsync();
-            return entityToUpdate;
+            return new HttpGoodOutcome<Book>(HttpGoodOutcomeTag.Ok, entityToUpdate);
         }
         catch (Exception e)
         {
